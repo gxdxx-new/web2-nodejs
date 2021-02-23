@@ -2,7 +2,7 @@ console.log(Math.round(1.6)); //2
 console.log(Math.round(1.4)); //1
 
 function sum(first, second) { // parameter
-  console.log(first + second);
+  return first + second;  //함수를 출력, 종료하는 키워드
 }
 
-sum(2, 4);  // argument
+console.log(sum(2, 4));  // argument
