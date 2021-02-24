@@ -7,11 +7,11 @@ function templateHTML(title, list, body) {
   return `
   <!doctype html>
   <html>
-  <head>
+  <head>  <!--페이지 제목-->
     <title>WEB1 - ${title}</title>
     <meta charset="utf-8">
   </head>
-  <body>
+  <body>  <!--페이지 내용-->
     <h1><a href="/">WEB</a></h1>
     ${list}
     <a href="/create">create</a>
@@ -94,12 +94,15 @@ var app = http.createServer(function(request,response){
         body += data; //웹브라우저가 보낸 정보들을 저장
       });
       request.on('end', function() {
-        var post = qs.parse(body);
+        var post = qs.parse(body);  //post변수에 post정보를 저장(querystring)
         var title = post.title;
         var description = post.description;
+        //파일을 저장(`data/${title}`은 생성할 파일, description은 저장할 내용
+        fs.writeFile(`data/${title}`, description, 'utf8', function(err) {  //err:에러가 있을 경우 에러를 처리하는 방법을 제공
+          response.writeHead(302, {Location: `/?id=${title}`});  //리다이렉션(Location으로 이동)
+          response.end();
+        });
       });
-      response.writeHead(200);  //파일을 성공적으로 전송
-      response.end('success'); //success을 보여줌
     } else {
         response.writeHead(400);  //파일을 찾을 수 없음
         response.end('Not found');  //Not found을 보여줌
