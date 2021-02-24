@@ -1,0 +1,13 @@
+<!--form 태그는 form태그 각각의 control에 사용자가 입력한 정보를 submit버튼을 눌렀을 때
+ action 속성이 가리기는 서버로 query String의 형태로 data를 전송하는 기능-->
+<!--서버로부터 사용자가 data를 가져올 때는 get방식(query string) 수정,삭제,생성과
+ 같은 작업은 method="post"을 사용해서 url에 query string이 보이지 않게 보냄. -->
+<form action="http://localhost:3000/process_create" method="post">  <!--form 아래 입력한 정보를 주소로 전송-->
+  <p><input type="text" name="title"></p>  <!--한줄 입력-->
+  <p>
+    <textarea name="descripton"></textarea> <!--여러줄 입력-->
+  </p>
+  <p>
+    <input type="submit"> <!--전송버튼-->
+  </p>
+</form>
