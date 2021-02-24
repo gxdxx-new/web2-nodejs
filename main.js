@@ -13,13 +13,14 @@ function templateHTML(title, list, body) {
   <body>
     <h1><a href="/">WEB</a></h1>
     ${list}
+    <a href="/create">create</a>
     ${body}
   </body>
   </html>
   `;
 }
 
-function templateList(filslist) {
+function templateList(filelist) {
   var list = '<ul>';
   var i = 0;
   while(i < filelist.length) {
@@ -66,6 +67,25 @@ var app = http.createServer(function(request,response){
           });
         });
       }
+    } else if(pathname === '/create') {
+      //`./data`디렉토리에 있는 파일 목록을 가져옴. filelist에는 data디렉토리의 파일명들이 들어옴
+      fs.readdir('./data', function(error, filelist) {
+        var title = 'WEB - create';
+        var list = templateList(filelist);
+        var template = templateHTML(title, list, `
+          <form action="http://localhost:3000/process_create" method="post">  <!--form 아래 입력한 정보를 주소로 전송-->
+            <p><input type="text" name="title" placeholder="title"></p>  <!--한줄 입력-->
+            <p>
+              <textarea name="description" placeholder="description"></textarea> <!--여러줄 입력-->
+            </p>
+            <p>
+              <input type="submit"> <!--전송버튼-->
+            </p>
+          </form>
+          `);
+        response.writeHead(200);  //파일을 성공적으로 전송
+        response.end(template); //template을 보여줌
+      });
     } else {
         response.writeHead(400);  //파일을 찾을 수 없음
         response.end('Not found');  //Not found을 보여줌
