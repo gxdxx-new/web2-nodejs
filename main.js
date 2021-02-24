@@ -1,6 +1,7 @@
 var http = require('http');
 var fs = require('fs'); //node.js의 모듈인 fileSystem을 다룰 수 있게됨
 var url = require('url'); //모듈
+var qs = require('querystring');
 
 function templateHTML(title, list, body) {
   return `
@@ -38,7 +39,8 @@ function templateList(filelist) {
   </ul>`;
   */
 }
-
+//createServer은 Nodejs로 웹브라우저가 접속이 들어올 때마다 callback함수를 Nodejs가 호출
+//request(요청할 때 웹브라우저가 보낸 정보들), response(응답할 때 우리가 웹브라우저에게 전송할 정보들)
 var app = http.createServer(function(request,response){
     var _url = request.url;
     var queryData = url.parse(_url, true).query;
@@ -67,16 +69,16 @@ var app = http.createServer(function(request,response){
           });
         });
       }
-    } else if(pathname === '/create') {
+    } else if(pathname === '/create') { //create버튼을 클릭하면 입력 상자가 생김
       //`./data`디렉토리에 있는 파일 목록을 가져옴. filelist에는 data디렉토리의 파일명들이 들어옴
       fs.readdir('./data', function(error, filelist) {
         var title = 'WEB - create';
         var list = templateList(filelist);
         var template = templateHTML(title, list, `
-          <form action="http://localhost:3000/process_create" method="post">  <!--form 아래 입력한 정보를 주소로 전송-->
+          <form action="http://localhost:3000/create_process" method="post">  <!--form 아래 입력한 정보를 주소로 전송-->
             <p><input type="text" name="title" placeholder="title"></p>  <!--한줄 입력-->
             <p>
-              <textarea name="description" placeholder="description"></textarea> <!--여러줄 입력-->
+              <textarea name="description" placeholder="description"></textarea>  <!--여러줄 입력-->
             </p>
             <p>
               <input type="submit"> <!--전송버튼-->
@@ -86,6 +88,18 @@ var app = http.createServer(function(request,response){
         response.writeHead(200);  //파일을 성공적으로 전송
         response.end(template); //template을 보여줌
       });
+    } else if(pathname === '/create_process') { //입력상자에 입력을 다 하고 create버튼을 클릭하면 /create_process로 이동
+      var body = '';
+      request.on('data', function(data) { //data를 한개씩 받다가 마지막에 'end'다음의 callback함수를 호출
+        body += data; //웹브라우저가 보낸 정보들을 저장
+      });
+      request.on('end', function() {
+        var post = qs.parse(body);
+        var title = post.title;
+        var description = post.description;
+      });
+      response.writeHead(200);  //파일을 성공적으로 전송
+      response.end('success'); //success을 보여줌
     } else {
         response.writeHead(400);  //파일을 찾을 수 없음
         response.end('Not found');  //Not found을 보여줌
