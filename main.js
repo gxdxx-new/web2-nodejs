@@ -80,8 +80,8 @@ var app = http.createServer(function(request,response){
         var title = 'WEB - create';
         var list = templateList(filelist);
         var template = templateHTML(title, list, `
-          <form action="http://localhost:3000/create_process" method="post">  <!--form 아래 입력한 정보를 주소로 전송-->
-            <p><input type="text" name="title" placeholder="title"></p>  <!--한줄 입력-->
+          <form action="/create_process" method="post">  <!--form 아래 입력한 정보를 주소로 전송-->
+            <p><input type="text" name="title" placeholder="title"></p>  <!--한줄 입력, placeholder는 미리 보이는 문자-->
             <p>
               <textarea name="description" placeholder="description"></textarea>  <!--여러줄 입력-->
             </p>
@@ -108,8 +108,33 @@ var app = http.createServer(function(request,response){
           response.end();
         });
       });
+    } else if(pathname === '/update') {
+      //`./data`디렉토리에 있는 파일 목록을 가져옴. filelist에는 data디렉토리의 파일명들이 들어옴
+      fs.readdir('./data', function(error, filelist) {
+        //`data/${queryData.id}` 파일의 내용을 읽어서 description변수에 저장
+        fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description) {
+          var title = queryData.id;
+          var list = templateList(filelist);
+          var template = templateHTML(title, list,
+            `
+            <form action="/update_process" method="post">  <!--form 아래 입력한 정보를 주소로 전송-->
+              <input type ="hidden" name="id" value="${title}">  <!--id값은 변경되지않음.-->
+              <p><input type="text" name="title" value="${title}"></p>  <!--한줄 입력, value="${title}가 title에 기본값으로 들어오게 함"-->
+              <p>
+                <textarea name="description">${description}</textarea>  <!--여러줄 입력-->
+              </p>
+              <p>
+                <input type="submit"> <!--전송버튼-->
+              </p>
+            </form>
+            `,
+            `<a href="/create">create</a> <a href="/update?id=${title}">update</a>`);
+          response.writeHead(200);  //파일을 성공적으로 전송
+          response.end(template); //template을 보여줌
+        });
+      });
     } else {
-        response.writeHead(400);  //파일을 찾을 수 없음
+        response.writeHead(404);  //파일을 찾을 수 없음
         response.end('Not found');  //Not found을 보여줌
       }
   });
