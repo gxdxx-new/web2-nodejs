@@ -54,7 +54,7 @@ var app = http.createServer(function(request, response){
           var list = templateList(filelist);
           var template = templateHTML(title, list,
             `<h2>${title}</h2>${description}`,
-            `<a href="/create">create</a>` //home에서는 update 버튼 안나오게
+            `<a href="/create">create</a>` //home에서는 update 버튼 안나오게, /create로 이동
           );
           response.writeHead(200);  //파일을 성공적으로 전송
           response.end(template); //template을 보여줌
@@ -70,7 +70,7 @@ var app = http.createServer(function(request, response){
               `<h2>${title}</h2>${description}`,
               ` <a href="/create">create</a>
                 <a href="/update?id=${title}">update</a>
-                <form action"/delete_process" method="post">  <!--delete링크는 알려지면 안돼서 form으로 해야됨-->
+                <form action="/delete_process" method="post">  <!--delete링크는 알려지면 안돼서 form으로 해야됨-->
                   <input type="hidden" name="id" value="${title}">
                   <input type="submit" value="delete">  <!--delete란 이름의 버튼 생성-->
                 </form>`
@@ -154,6 +154,19 @@ var app = http.createServer(function(request, response){
             response.writeHead(302, {Location: `/?id=${title}`});  //리다이렉션(Location으로 이동)
             response.end();
           });
+        });
+      });
+    } else if(pathname === '/delete_process') {
+      var body = '';
+      request.on('data', function(data) { //data를 한개씩 받다가 마지막에 'end'다음의 callback함수를 호출
+        body += data; //웹브라우저가 보낸 정보들을 저장
+      });
+      request.on('end', function() {
+        var post = qs.parse(body);  //post변수에 post정보를 저장(querystring)
+        var id = post.id; //삭제할 때는 id만 전송됨
+        fs.unlink(`data/${id}`, function(error) {
+          response.writeHead(302, {Location: `/`});  //리다이렉션(Location으로 이동): home으로 이동
+          response.end();
         });
       });
     } else {
