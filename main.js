@@ -68,7 +68,13 @@ var app = http.createServer(function(request, response){
             var list = templateList(filelist);
             var template = templateHTML(title, list,
               `<h2>${title}</h2>${description}`,
-              `<a href="/create">create</a> <a href="/update?id=${title}">update</a>`);
+              ` <a href="/create">create</a>
+                <a href="/update?id=${title}">update</a>
+                <form action"/delete_process" method="post">  <!--delete링크는 알려지면 안돼서 form으로 해야됨-->
+                  <input type="hidden" name="id" value="${title}">
+                  <input type="submit" value="delete">  <!--delete란 이름의 버튼 생성-->
+                </form>`
+            );
             response.writeHead(200);  //파일을 성공적으로 전송
             response.end(template); //template을 보여줌
           });
