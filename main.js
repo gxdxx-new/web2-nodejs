@@ -4,6 +4,7 @@ var url = require('url'); //모듈
 var qs = require('querystring');
 var template = require('./lib/template.js');
 var path = require('path'); //경로를 탐색해 나갈 수 있는 정보를 숨겨줌(외부에서 들어온 정보, 외부에서 들어온 정보가 바깥으로 나갈 때)
+var sanitizeHtml = require('sanitize-html');  //var clean=sanitizedHtml(dirty); <- dirty HTML(위험할 수 있는 태그)를 clean하게 해줌
 
 //createServer은 Nodejs로 웹브라우저가 접속이 들어올 때마다 callback함수를 Nodejs가 호출
 //request(요청할 때 웹브라우저가 보낸 정보들), response(응답할 때 우리가 웹브라우저에게 전송할 정보들)
@@ -32,13 +33,17 @@ var app = http.createServer(function(request, response){
           //`data/${queryData.id}` 파일의 내용을 읽어서 description변수에 저장
           fs.readFile(`data/${filteredId}`, 'utf8', function(err, description) {
             var title = queryData.id;
+            var sanitizedTitle = sanitizeHtml(title);
+            var sanitizedDescription = sanitizeHtml(description, {
+              allowedTags:['h1']  //h1태그는 허용하게함(다른 태그들은 입력되어도 무시함)
+            });
             var list = template.list(filelist);
-            var html = template.HTML(title, list,
-              `<h2>${title}</h2>${description}`,
+            var html = template.HTML(sanitizedTitle, list,
+              `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
               ` <a href="/create">create</a>
-                <a href="/update?id=${title}">update</a>
+                <a href="/update?id=${sanitizedTitle}">update</a>
                 <form action="/delete_process" method="post">  <!--delete링크는 알려지면 안돼서 form으로 해야됨-->
-                  <input type="hidden" name="id" value="${title}">
+                  <input type="hidden" name="id" value="${sanitizedTitle}">
                   <input type="submit" value="delete">  <!--delete란 이름의 버튼 생성-->
                 </form>`
             );
