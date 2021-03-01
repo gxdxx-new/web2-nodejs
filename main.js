@@ -3,6 +3,7 @@ var fs = require('fs'); //node.js의 모듈인 fileSystem을 다룰 수 있게�
 var url = require('url'); //모듈
 var qs = require('querystring');
 var template = require('./lib/template.js');
+var path = require('path'); //경로를 탐색해 나갈 수 있는 정보를 숨겨줌(외부에서 들어온 정보, 외부에서 들어온 정보가 바깥으로 나갈 때)
 
 //createServer은 Nodejs로 웹브라우저가 접속이 들어올 때마다 callback함수를 Nodejs가 호출
 //request(요청할 때 웹브라우저가 보낸 정보들), response(응답할 때 우리가 웹브라우저에게 전송할 정보들)
@@ -27,8 +28,9 @@ var app = http.createServer(function(request, response){
       } else {  //id값이 있는 경우
         //`./data`디렉토리에 있는 파일 목록을 가져옴. filelist에는 data디렉토리의 파일명들이 들어옴
         fs.readdir('./data', function(error, filelist) {
+          var filteredId = path.parse(queryData.id).base; //queryData.id(경로정보)를 path.parse에 넣어서 정보를 숨김
           //`data/${queryData.id}` 파일의 내용을 읽어서 description변수에 저장
-          fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description) {
+          fs.readFile(`data/${filteredId}`, 'utf8', function(err, description) {
             var title = queryData.id;
             var list = template.list(filelist);
             var html = template.HTML(title, list,
@@ -82,8 +84,9 @@ var app = http.createServer(function(request, response){
     } else if(pathname === '/update') {
       //`./data`디렉토리에 있는 파일 목록을 가져옴. filelist에는 data디렉토리의 파일명들이 들어옴
       fs.readdir('./data', function(error, filelist) {
+        var filteredId = path.parse(queryData.id).base; //queryData.id(경로정보)를 path.parse에 넣어서 정보를 숨김
         //`data/${queryData.id}` 파일의 내용을 읽어서 description변수에 저장
-        fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description) {
+        fs.readFile(`data/${filteresId}`, 'utf8', function(err, description) {
           var title = queryData.id;
           var list = template.list(filelist);
           var html = template.HTML(title, list, `
@@ -129,7 +132,8 @@ var app = http.createServer(function(request, response){
       request.on('end', function() {
         var post = qs.parse(body);  //post변수에 post정보를 저장(querystring)
         var id = post.id; //삭제할 때는 id만 전송됨
-        fs.unlink(`data/${id}`, function(error) {
+        var filteredId = path.parse(id).base; //post.id(경로정보)를 path.parse에 넣어서 정보를 숨김
+        fs.unlink(`data/${filteredId}`, function(error) {
           response.writeHead(302, {Location: `/`});  //리다이렉션(Location으로 이동): home으로 이동
           response.end();
         });
