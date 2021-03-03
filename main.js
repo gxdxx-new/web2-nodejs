@@ -197,15 +197,19 @@ var app = http.createServer(function(request, response){
       });
       request.on('end', function() {
         var post = qs.parse(body);  //post변수에 post정보를 저장(querystring)
-        var id = post.id; //수정할 때는 id값이 필요
-        var title = post.title;
-        var description = post.description;
-        fs.rename(`data/${id}`, `data/${title}`, function(error) { //fs.rename(oldPath, newPath, callback)
-          //파일을 저장 (`data/${title}`은 생성할 파일, description은 저장할 내용)
-          fs.writeFile(`data/${title}`, description, 'utf8', function(err) {  //err:에러가 있을 경우 에러를 처리하는 방법을 제공
-            response.writeHead(302, {Location: `/?id=${title}`});  //리다이렉션(Location으로 이동)
-            response.end();
-          });
+        // var id = post.id; //수정할 때는 id값이 필요
+        // var title = post.title;
+        // var description = post.description;
+        // fs.rename(`data/${id}`, `data/${title}`, function(error) { //fs.rename(oldPath, newPath, callback)
+        //   //파일을 저장 (`data/${title}`은 생성할 파일, description은 저장할 내용)
+        //   fs.writeFile(`data/${title}`, description, 'utf8', function(err) {  //err:에러가 있을 경우 에러를 처리하는 방법을 제공
+        //     response.writeHead(302, {Location: `/?id=${title}`});  //리다이렉션(Location으로 이동)
+        //     response.end();
+        //   });
+        // });
+        db.query(`UPDATE topic SET title=?, description=?, author_id=1 WHERE id=?`, [post.title, post.description, post.id], function(error, result){
+          response.writeHead(302, {Location: `/?id=${post.id}`});  //리다이렉션(Location으로 이동)
+          response.end();
         });
       });
     } else if(pathname === '/delete_process') {
