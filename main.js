@@ -35,7 +35,7 @@ var app = http.createServer(function(request, response){
         //   response.writeHead(200);  //파일을 성공적으로 전송
         //   response.end(html); //template을 보여줌
         // });
-        db.query(`SELECT * FROM topic`, function(error, topics){
+        db.query(`SELECT * FROM topic`, function(error, topics){  //callback:sql문이 실행된 후에 서버가 응답한 결과를 처리해줌
           var title = 'Welcome';
           var description = 'Hello, Node.js';
           var list = template.list(topics);
@@ -45,30 +45,54 @@ var app = http.createServer(function(request, response){
           );
           response.writeHead(200);
           response.end(html);
-        }); //callback:sql문이 실행된 후에 서버가 응답한 결과를 처리해줌
+        });
       } else {  //id값이 있는 경우
-        //`./data`디렉토리에 있는 파일 목록을 가져옴. filelist에는 data디렉토리의 파일명들이 들어옴
-        fs.readdir('./data', function(error, filelist) {
-          var filteredId = path.parse(queryData.id).base; //queryData.id(경로정보)를 path.parse에 넣어서 정보를 숨김
-          //`data/${queryData.id}` 파일의 내용을 읽어서 description변수에 저장
-          fs.readFile(`data/${filteredId}`, 'utf8', function(err, description) {
-            var title = queryData.id;
-            var sanitizedTitle = sanitizeHtml(title);
-            var sanitizedDescription = sanitizeHtml(description, {
-              allowedTags:['h1']  //h1태그는 허용하게함(다른 태그들은 입력되어도 무시함)
-            });
-            var list = template.list(filelist);
-            var html = template.HTML(sanitizedTitle, list,
-              `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
+        // //`./data`디렉토리에 있는 파일 목록을 가져옴. filelist에는 data디렉토리의 파일명들이 들어옴
+        // fs.readdir('./data', function(error, filelist) {
+        //   var filteredId = path.parse(queryData.id).base; //queryData.id(경로정보)를 path.parse에 넣어서 정보를 숨김
+        //   //`data/${queryData.id}` 파일의 내용을 읽어서 description변수에 저장
+        //   fs.readFile(`data/${filteredId}`, 'utf8', function(err, description) {
+        //     var title = queryData.id;
+        //     var sanitizedTitle = sanitizeHtml(title);
+        //     var sanitizedDescription = sanitizeHtml(description, {
+        //       allowedTags:['h1']  //h1태그는 허용하게함(다른 태그들은 입력되어도 무시함)
+        //     });
+        //     var list = template.list(filelist);
+        //     var html = template.HTML(sanitizedTitle, list,
+        //       `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
+        //       ` <a href="/create">create</a>
+        //         <a href="/update?id=${sanitizedTitle}">update</a>
+        //         <form action="/delete_process" method="post">  <!--delete링크는 알려지면 안돼서 form으로 해야됨-->
+        //           <input type="hidden" name="id" value="${sanitizedTitle}">
+        //           <input type="submit" value="delete">  <!--delete란 이름의 버튼 생성-->
+        //         </form>`
+        //     );
+        //     response.writeHead(200);  //파일을 성공적으로 전송
+        //     response.end(html); //template을 보여줌
+        //   });
+        // });
+        db.query(`SELECT * FROM topic`, function(error, topics){  //callback:sql문이 실행된 후에 서버가 응답한 결과를 처리해줌
+          if(error) {
+            throw error;  //error가 있으면 그다음 코드를 실행하지 않음
+          }
+          db.query(`SELECT * FROM topic WHERE id=?`, [queryData.id], function(error2, topic){ //보안을 위해 sql문에 ?로 두번째 인자가 치환되도록 함
+            if(error2) {
+              throw error2;
+            }
+            var title = topic[0].title; //topic은 배열에 담겨서 들어옴
+            var description = topic[0].description;
+            var list = template.list(topics);
+            var html = template.HTML(title, list,
+              `<h2>${title}</h2>${description}`,
               ` <a href="/create">create</a>
-                <a href="/update?id=${sanitizedTitle}">update</a>
+                <a href="/update?id=${queryData.id}}">update</a>
                 <form action="/delete_process" method="post">  <!--delete링크는 알려지면 안돼서 form으로 해야됨-->
-                  <input type="hidden" name="id" value="${sanitizedTitle}">
-                  <input type="submit" value="delete">  <!--delete란 이름의 버튼 생성-->
+                <input type="hidden" name="id" value="${queryData.id}">
+                <input type="submit" value="delete">  <!--delete란 이름의 버튼 생성-->
                 </form>`
             );
-            response.writeHead(200);  //파일을 성공적으로 전송
-            response.end(html); //template을 보여줌
+            response.writeHead(200);
+            response.end(html);
           });
         });
       }
