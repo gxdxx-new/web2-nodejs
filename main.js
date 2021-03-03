@@ -97,11 +97,29 @@ var app = http.createServer(function(request, response){
         });
       }
     } else if(pathname === '/create') { //create버튼을 클릭하면 입력 상자가 생김
-      //`./data`디렉토리에 있는 파일 목록을 가져옴. filelist에는 data디렉토리의 파일명들이 들어옴
-      fs.readdir('./data', function(error, filelist) {
-        var title = 'WEB - create';
-        var list = template.list(filelist);
-        var html = template.HTML(title, list, `
+      // //`./data`디렉토리에 있는 파일 목록을 가져옴. filelist에는 data디렉토리의 파일명들이 들어옴
+      // fs.readdir('./data', function(error, filelist) {
+      //   var title = 'WEB - create';
+      //   var list = template.list(filelist);
+      //   var html = template.HTML(title, list, `
+      //     <form action="/create_process" method="post">  <!--form 아래 입력한 정보를 주소로 전송-->
+      //       <p><input type="text" name="title" placeholder="title"></p>  <!--한줄 입력, placeholder는 미리 보이는 문자-->
+      //       <p>
+      //         <textarea name="description" placeholder="description"></textarea>  <!--여러줄 입력-->
+      //       </p>
+      //       <p>
+      //         <input type="submit"> <!--전송버튼-->
+      //       </p>
+      //     </form>
+      //     `, '');
+      //   response.writeHead(200);  //파일을 성공적으로 전송
+      //   response.end(html); //template을 보여줌
+      // });
+      db.query(`SELECT * FROM topic`, function(error, topics){  //callback:sql문이 실행된 후에 서버가 응답한 결과를 처리해줌
+        var title = 'Create';
+        var list = template.list(topics);
+        var html = template.HTML(title, list,
+          `
           <form action="/create_process" method="post">  <!--form 아래 입력한 정보를 주소로 전송-->
             <p><input type="text" name="title" placeholder="title"></p>  <!--한줄 입력, placeholder는 미리 보이는 문자-->
             <p>
@@ -111,9 +129,11 @@ var app = http.createServer(function(request, response){
               <input type="submit"> <!--전송버튼-->
             </p>
           </form>
-          `, '');
-        response.writeHead(200);  //파일을 성공적으로 전송
-        response.end(html); //template을 보여줌
+          `,
+          `<a href="/create">create</a>` //home에서는 update 버튼 안나오게, /create로 이동
+        );
+        response.writeHead(200);
+        response.end(html);
       });
     } else if(pathname === '/create_process') { //입력상자에 입력을 다 하고 create버튼을 클릭하면 /create_process로 이동
       var body = '';
@@ -122,13 +142,23 @@ var app = http.createServer(function(request, response){
       });
       request.on('end', function() {
         var post = qs.parse(body);  //post변수에 post정보를 저장(querystring)
-        var title = post.title;
-        var description = post.description;
-        //파일을 저장(`data/${title}`은 생성할 파일, description은 저장할 내용
-        fs.writeFile(`data/${title}`, description, 'utf8', function(err) {  //err:에러가 있을 경우 에러를 처리하는 방법을 제공
-          response.writeHead(302, {Location: `/?id=${title}`});  //리다이렉션(Location으로 이동)
-          response.end();
-        });
+        // //파일을 저장(`data/${title}`은 생성할 파일, description은 저장할 내용
+        // fs.writeFile(`data/${title}`, description, 'utf8', function(err) {  //err:에러가 있을 경우 에러를 처리하는 방법을 제공
+        //   response.writeHead(302, {Location: `/?id=${title}`});  //리다이렉션(Location으로 이동)
+        //   response.end();
+        // });
+        db.query(`
+          INSERT INTO topic (title, description, created, author_id)
+            VALUES(?, ?, NOW(), ?);`, 
+            [post.title, post.description, 1], 
+            function(error, result){
+              if(error){
+                throw error;
+              }
+              response.writeHead(302, {Location: `/?id=${result.insertId}`});
+              response.end();
+            }
+        );
       });
     } else if(pathname === '/update') {
       //`./data`디렉토리에 있는 파일 목록을 가져옴. filelist에는 data디렉토리의 파일명들이 들어옴
