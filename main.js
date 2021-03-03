@@ -36,9 +36,15 @@ var app = http.createServer(function(request, response){
         //   response.end(html); //template을 보여줌
         // });
         db.query(`SELECT * FROM topic`, function(error, topics){
-          console.log(topics);
+          var title = 'Welcome';
+          var description = 'Hello, Node.js';
+          var list = template.list(topics);
+          var html = template.HTML(title, list,
+            `<h2>${title}</h2>${description}`,
+            `<a href="/create">create</a>` //home에서는 update 버튼 안나오게, /create로 이동
+          );
           response.writeHead(200);
-          response.end('Success');
+          response.end(html);
         }); //callback:sql문이 실행된 후에 서버가 응답한 결과를 처리해줌
       } else {  //id값이 있는 경우
         //`./data`디렉토리에 있는 파일 목록을 가져옴. filelist에는 data디렉토리의 파일명들이 들어옴
