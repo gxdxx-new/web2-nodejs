@@ -5,6 +5,15 @@ var qs = require('querystring');
 var template = require('./lib/template.js');
 var path = require('path'); //경로를 탐색해 나갈 수 있는 정보를 숨겨줌(외부에서 들어온 정보, 외부에서 들어온 정보가 바깥으로 나갈 때)
 var sanitizeHtml = require('sanitize-html');  //var clean=sanitizedHtml(dirty); <- dirty HTML(위험할 수 있는 태그)를 clean하게 해줌
+var mysql = require('mysql');
+var db = mysql.createConnection({ //mysql에 접속
+  host:'localhost',
+  user:'nodejs',
+  password:'000000',
+  port:'3307',
+  database:'opentutorials'
+});
+db.connect();
 
 //createServer은 Nodejs로 웹브라우저가 접속이 들어올 때마다 callback함수를 Nodejs가 호출
 //request(요청할 때 웹브라우저가 보낸 정보들), response(응답할 때 우리가 웹브라우저에게 전송할 정보들)
@@ -13,19 +22,24 @@ var app = http.createServer(function(request, response){
     var queryData = url.parse(_url, true).query;
     var pathname = url.parse(_url, true).pathname;
     if(pathname === '/') {
-      if(queryData.id === undefined) {  //id값이 없는 경우
-        //`./data`디렉토리에 있는 파일 목록을 가져옴. filelist에는 data디렉토리의 파일명들이 들어옴
-        fs.readdir('./data', function(error, filelist) {
-          var title = 'Welcome';
-          var description = 'Hello, Node.js';
-          var list = template.list(filelist);
-          var html = template.HTML(title, list,
-            `<h2>${title}</h2>${description}`,
-            `<a href="/create">create</a>` //home에서는 update 버튼 안나오게, /create로 이동
-          );
-          response.writeHead(200);  //파일을 성공적으로 전송
-          response.end(html); //template을 보여줌
-        });
+      if(queryData.id === undefined) {  //id값이 없는 경우(홈 화면)
+        // //`./data`디렉토리에 있는 파일 목록을 가져옴. filelist에는 data디렉토리의 파일명들이 들어옴
+        // fs.readdir('./data', function(error, filelist) {
+        //   var title = 'Welcome';
+        //   var description = 'Hello, Node.js';
+        //   var list = template.list(filelist);
+        //   var html = template.HTML(title, list,
+        //     `<h2>${title}</h2>${description}`,
+        //     `<a href="/create">create</a>` //home에서는 update 버튼 안나오게, /create로 이동
+        //   );
+        //   response.writeHead(200);  //파일을 성공적으로 전송
+        //   response.end(html); //template을 보여줌
+        // });
+        db.query(`SELECT * FROM topic`, function(error, topics){
+          console.log(topics);
+          response.writeHead(200);
+          response.end('Success');
+        }); //callback:sql문이 실행된 후에 서버가 응답한 결과를 처리해줌
       } else {  //id값이 있는 경우
         //`./data`디렉토리에 있는 파일 목록을 가져옴. filelist에는 data디렉토리의 파일명들이 들어옴
         fs.readdir('./data', function(error, filelist) {
