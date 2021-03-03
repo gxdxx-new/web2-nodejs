@@ -161,26 +161,31 @@ var app = http.createServer(function(request, response){
         );
       });
     } else if(pathname === '/update') {
-      //`./data`디렉토리에 있는 파일 목록을 가져옴. filelist에는 data디렉토리의 파일명들이 들어옴
-      fs.readdir('./data', function(error, filelist) {
-        var filteredId = path.parse(queryData.id).base; //queryData.id(경로정보)를 path.parse에 넣어서 정보를 숨김
-        //`data/${queryData.id}` 파일의 내용을 읽어서 description변수에 저장
-        fs.readFile(`data/${filteresId}`, 'utf8', function(err, description) {
-          var title = queryData.id;
-          var list = template.list(filelist);
-          var html = template.HTML(title, list, `
+      //   var filteredId = path.parse(queryData.id).base; //queryData.id(경로정보)를 path.parse에 넣어서 정보를 숨김
+      db.query('SELECT * FROM topic', function(error, topics){
+        if(error){
+          throw error;
+        }
+        db.query('SELECT * FROM topic WHERE id=?', [queryData.id], function(error2, topic){
+          if(error2){
+            throw error2;
+          }
+          var list = template.list(topics);
+          var html = template.HTML(topic[0].title, list,
+            `
             <form action="/update_process" method="post">  <!--form 아래 입력한 정보를 주소로 전송-->
-              <input type ="hidden" name="id" value="${title}">  <!--id값은 변경되지않음.-->
-              <p><input type="text" name="title" value="${title}"></p>  <!--한줄 입력, value="${title}가 title에 기본값으로 들어오게 함"-->
+              <input type ="hidden" name="id" value="${topic[0].id}">  <!--id값은 변경되지않음.-->
+              <p><input type="text" name="title" value="${topic[0].title}"></p>  <!--한줄 입력, value="${topic[0].title}가 title에 기본값으로 들어오게 함"-->
               <p>
-                <textarea name="description">${description}</textarea>  <!--여러줄 입력-->
+                <textarea name="description">${topic[0].description}</textarea>  <!--여러줄 입력-->
               </p>
               <p>
                 <input type="submit"> <!--전송버튼-->
               </p>
             </form>
             `,
-            `<a href="/create">create</a> <a href="/update?id=${title}">update</a>`);
+            `<a href="/create">create</a> <a href="/update?id=${topic[0].id}">update</a>`
+          );
           response.writeHead(200);  //파일을 성공적으로 전송
           response.end(html); //template을 보여줌
         });
