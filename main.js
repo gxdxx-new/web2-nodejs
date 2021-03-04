@@ -72,18 +72,18 @@ var app = http.createServer(function(request, response){
         //   });
         // });
         db.query(`SELECT * FROM topic`, function(error, topics){  //callback:sql문이 실행된 후에 서버가 응답한 결과를 처리해줌
-          if(error) {
-            throw error;  //error가 있으면 그다음 코드를 실행하지 않음
-          }
-          db.query(`SELECT * FROM topic WHERE id=?`, [queryData.id], function(error2, topic){ //보안을 위해 sql문에 ?로 두번째 인자가 치환되도록 함
-            if(error2) {
-              throw error2;
-            }
+          if(error) throw error;  //error가 있으면 그다음 코드를 실행하지 않음
+          db.query(`SELECT * FROM topic LEFT JOIN author ON topic.author_id=author.id WHERE topic.id=?`, [queryData.id], function(error2, topic){ //보안을 위해 sql문에 ?로 두번째 인자가 치환되도록 함
+            if(error2) throw error2;
             var title = topic[0].title; //topic은 배열에 담겨서 들어옴
             var description = topic[0].description;
             var list = template.list(topics);
             var html = template.HTML(title, list,
-              `<h2>${title}</h2>${description}`,
+              `
+              <h2>${title}</h2>
+              ${description}
+              <p>by ${topic[0].name}</p>  <!--<p>태그=줄바꿈-->
+              `,
               ` <a href="/create">create</a>
                 <a href="/update?id=${queryData.id}}">update</a>
                 <form action="/delete_process" method="post">  <!--delete링크는 알려지면 안돼서 form으로 해야됨-->
@@ -152,9 +152,7 @@ var app = http.createServer(function(request, response){
             VALUES(?, ?, NOW(), ?);`, 
             [post.title, post.description, 1], 
             function(error, result){
-              if(error){
-                throw error;
-              }
+              if(error) throw error;
               response.writeHead(302, {Location: `/?id=${result.insertId}`});
               response.end();
             }
@@ -163,13 +161,9 @@ var app = http.createServer(function(request, response){
     } else if(pathname === '/update') {
       //   var filteredId = path.parse(queryData.id).base; //queryData.id(경로정보)를 path.parse에 넣어서 정보를 숨김
       db.query('SELECT * FROM topic', function(error, topics){
-        if(error){
-          throw error;
-        }
+        if(error) throw error;
         db.query('SELECT * FROM topic WHERE id=?', [queryData.id], function(error2, topic){
-          if(error2){
-            throw error2;
-          }
+          if(error2) throw error2;
           var list = template.list(topics);
           var html = template.HTML(topic[0].title, list,
             `
@@ -222,9 +216,7 @@ var app = http.createServer(function(request, response){
         var id = post.id; //삭제할 때는 id만 전송됨
         var filteredId = path.parse(id).base; //post.id(경로정보)를 path.parse에 넣어서 정보를 숨김
         db.query(`DELETE FROM topic WHERE id=?`, [post.id], function(error, result){
-          if(error) {
-            throw error;
-          }
+          if(error) throw error;
           response.writeHead(302, {Location: `/`});  //리다이렉션(Location으로 이동): home으로 이동
           response.end();
         });
