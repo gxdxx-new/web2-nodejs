@@ -85,7 +85,7 @@ var app = http.createServer(function(request, response){
               <p>by ${topic[0].name}</p>  <!--<p>태그=줄바꿈-->
               `,
               ` <a href="/create">create</a>
-                <a href="/update?id=${queryData.id}}">update</a>
+                <a href="/update?id=${queryData.id}">update</a>
                 <form action="/delete_process" method="post">  <!--delete링크는 알려지면 안돼서 form으로 해야됨-->
                 <input type="hidden" name="id" value="${queryData.id}">
                 <input type="submit" value="delete">  <!--delete란 이름의 버튼 생성-->
@@ -166,28 +166,34 @@ var app = http.createServer(function(request, response){
       });
     } else if(pathname === '/update') {
       //   var filteredId = path.parse(queryData.id).base; //queryData.id(경로정보)를 path.parse에 넣어서 정보를 숨김
-      db.query('SELECT * FROM topic', function(error, topics){
+      db.query(`SELECT * FROM topic`, function(error, topics){
         if(error) throw error;
-        db.query('SELECT * FROM topic WHERE id=?', [queryData.id], function(error2, topic){
+        db.query(`SELECT * FROM topic WHERE id=?`, [queryData.id], function(error2, topic){
           if(error2) throw error2;
-          var list = template.list(topics);
-          var html = template.HTML(topic[0].title, list,
-            `
-            <form action="/update_process" method="post">  <!--form 아래 입력한 정보를 주소로 전송-->
-              <input type ="hidden" name="id" value="${topic[0].id}">  <!--id값은 변경되지않음.-->
-              <p><input type="text" name="title" value="${topic[0].title}"></p>  <!--한줄 입력, value="${topic[0].title}가 title에 기본값으로 들어오게 함"-->
-              <p>
-                <textarea name="description">${topic[0].description}</textarea>  <!--여러줄 입력-->
-              </p>
-              <p>
-                <input type="submit"> <!--전송버튼-->
-              </p>
-            </form>
-            `,
-            `<a href="/create">create</a> <a href="/update?id=${topic[0].id}">update</a>`
-          );
-          response.writeHead(200);  //파일을 성공적으로 전송
-          response.end(html); //template을 보여줌
+          db.query(`SELECT * FROM author`, function(error3, authors){
+            if(error3) throw error3;
+            var list = template.list(topics);
+            var html = template.HTML(topic[0].title, list,
+              `
+              <form action="/update_process" method="post">  <!--form 아래 입력한 정보를 주소로 전송-->
+                <input type ="hidden" name="id" value="${topic[0].id}">  <!--id값은 변경되지않음.-->
+                <p><input type="text" name="title" value="${topic[0].title}"></p>  <!--한줄 입력, value="${topic[0].title}가 title에 기본값으로 들어오게 함"-->
+                <p>
+                  <textarea name="description">${topic[0].description}</textarea>  <!--여러줄 입력-->
+                </p>
+                <p>
+                  ${template.authorSelect(authors, topic[0].author_id)}
+                </p>
+                <p>
+                  <input type="submit"> <!--전송버튼-->
+                </p>
+              </form>
+              `,
+              `<a href="/create">create</a> <a href="/update?id=${topic[0].id}">update</a>`
+            );
+            response.writeHead(200);  //파일을 성공적으로 전송
+            response.end(html); //template을 보여줌
+          });
         });
       });
     } else if(pathname === '/update_process') {
@@ -207,7 +213,7 @@ var app = http.createServer(function(request, response){
         //     response.end();
         //   });
         // });
-        db.query(`UPDATE topic SET title=?, description=?, author_id=1 WHERE id=?`, [post.title, post.description, post.id], function(error, result){
+        db.query(`UPDATE topic SET title=?, description=?, author_id=? WHERE id=?`, [post.title, post.description, post.author, post.id], function(error, result){
           response.writeHead(302, {Location: `/?id=${post.id}`});  //리다이렉션(Location으로 이동)
           response.end();
         });
