@@ -116,24 +116,30 @@ var app = http.createServer(function(request, response){
       //   response.end(html); //template을 보여줌
       // });
       db.query(`SELECT * FROM topic`, function(error, topics){  //callback:sql문이 실행된 후에 서버가 응답한 결과를 처리해줌
-        var title = 'Create';
-        var list = template.list(topics);
-        var html = template.HTML(title, list,
-          `
-          <form action="/create_process" method="post">  <!--form 아래 입력한 정보를 주소로 전송-->
-            <p><input type="text" name="title" placeholder="title"></p>  <!--한줄 입력, placeholder는 미리 보이는 문자-->
-            <p>
-              <textarea name="description" placeholder="description"></textarea>  <!--여러줄 입력-->
-            </p>
-            <p>
-              <input type="submit"> <!--전송버튼-->
-            </p>
-          </form>
-          `,
-          `<a href="/create">create</a>` //home에서는 update 버튼 안나오게, /create로 이동
-        );
-        response.writeHead(200);
-        response.end(html);
+        db.query(`SELECT * FROM author`, function(error2, authors){
+          if(error2) throw error2;
+          var title = 'Create';
+          var list = template.list(topics);
+          var html = template.HTML(title, list,
+            `
+            <form action="/create_process" method="post">  <!--form 아래 입력한 정보를 주소로 전송-->
+              <p><input type="text" name="title" placeholder="title"></p>  <!--한줄 입력, placeholder는 미리 보이는 문자-->
+              <p>
+                <textarea name="description" placeholder="description"></textarea>  <!--여러줄 입력-->
+              </p>
+              <p>
+                ${template.authorSelect(authors)}
+              </p>
+              <p>
+                <input type="submit"> <!--전송버튼-->
+              </p>
+            </form>
+            `,
+            `<a href="/create">create</a>` //home에서는 update 버튼 안나오게, /create로 이동
+          );
+          response.writeHead(200);
+          response.end(html);
+        });
       });
     } else if(pathname === '/create_process') { //입력상자에 입력을 다 하고 create버튼을 클릭하면 /create_process로 이동
       var body = '';
@@ -150,7 +156,7 @@ var app = http.createServer(function(request, response){
         db.query(`
           INSERT INTO topic (title, description, created, author_id)
             VALUES(?, ?, NOW(), ?);`, 
-            [post.title, post.description, 1], 
+            [post.title, post.description, post.author], 
             function(error, result){
               if(error) throw error;
               response.writeHead(302, {Location: `/?id=${result.insertId}`});
