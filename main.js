@@ -221,10 +221,17 @@ var app = http.createServer(function(request, response){
         var post = qs.parse(body);  //post변수에 post정보를 저장(querystring)
         var id = post.id; //삭제할 때는 id만 전송됨
         var filteredId = path.parse(id).base; //post.id(경로정보)를 path.parse에 넣어서 정보를 숨김
-        fs.unlink(`data/${filteredId}`, function(error) {
+        db.query(`DELETE FROM topic WHERE id=?`, [post.id], function(error, result){
+          if(error) {
+            throw error;
+          }
           response.writeHead(302, {Location: `/`});  //리다이렉션(Location으로 이동): home으로 이동
           response.end();
         });
+        // fs.unlink(`data/${filteredId}`, function(error) {
+        //   response.writeHead(302, {Location: `/`});  //리다이렉션(Location으로 이동): home으로 이동
+        //   response.end();
+        // });
       });
     } else {
         response.writeHead(404);  //파일을 찾을 수 없음
