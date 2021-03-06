@@ -9,7 +9,7 @@ var connection = mysql.createConnection({   //mysql 모듈과 관련된 객체�
  
 connection.connect();
  
-connection.query('SELECT * FROM topic', function (error, results, fields) {    //sql문, callback을 인자로 줌
+connection.query('SELECT * FROM topic', function (error, results) {    //sql문, callback을 인자로 줌
   if (error) {
       console.log(error);
   }
