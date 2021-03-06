@@ -1,19 +1,8 @@
 var http = require('http');
-var fs = require('fs'); //node.js의 모듈인 fileSystem을 다룰 수 있게됨
 var url = require('url'); //모듈
 var qs = require('querystring');
 var template = require('./lib/template.js');
-var path = require('path'); //경로를 탐색해 나갈 수 있는 정보를 숨겨줌(외부에서 들어온 정보, 외부에서 들어온 정보가 바깥으로 나갈 때)
-var sanitizeHtml = require('sanitize-html');  //var clean=sanitizedHtml(dirty); <- dirty HTML(위험할 수 있는 태그)를 clean하게 해줌
-var mysql = require('mysql');
-var db = mysql.createConnection({ //mysql에 접속
-  host:'localhost',
-  user:'nodejs',
-  password:'000000',
-  port:'3307',
-  database:'opentutorials'
-});
-db.connect();
+var db = require('./lib/db');
 
 //createServer은 Nodejs로 웹브라우저가 접속이 들어올 때마다 callback함수를 Nodejs가 호출
 //request(요청할 때 웹브라우저가 보낸 정보들), response(응답할 때 우리가 웹브라우저에게 전송할 정보들)
