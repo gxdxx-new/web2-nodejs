@@ -2,7 +2,8 @@ var http = require('http');
 var url = require('url'); //모듈
 var qs = require('querystring');
 var template = require('./lib/template.js');
-var db = require('./lib/db');
+var db = require('./lib/db.js');
+var topic = require('./lib/topic.js');
 
 //createServer은 Nodejs로 웹브라우저가 접속이 들어올 때마다 callback함수를 Nodejs가 호출
 //request(요청할 때 웹브라우저가 보낸 정보들), response(응답할 때 우리가 웹브라우저에게 전송할 정보들)
@@ -12,19 +13,7 @@ var app = http.createServer(function(request, response){
     var pathname = url.parse(_url, true).pathname;
     if(pathname === '/') {
       if(queryData.id === undefined) {  //id값이 없는 경우(홈 화면)
-        db.query(`SELECT * FROM topic`, function(error, topics){  //callback:sql문이 실행된 후에 서버가 응답한 결과를 처리해줌
-          if(error) throw error;
-          var title = 'Welcome';
-          var description = 'Hello, Node.js';
-          var list = template.list(topics);
-          var html = template.HTML(title, list,
-            `<h2>${title}</h2>
-            ${description}`,
-            `<a href="/create">create</a>` ///create로 이동, home에서는 update 버튼 안나오게
-          );
-          response.writeHead(200);
-          response.end(html);
-        });
+        topic.home(request, reponse); //request, response를 전달
       } else {  //id값이 있는 경우
         db.query(`SELECT * FROM topic`, function(error, topics){  //callback:sql문이 실행된 후에 서버가 응답한 결과를 처리해줌
           if(error) throw error;  //error가 있으면 그다음 코드를 실행하지 않음
