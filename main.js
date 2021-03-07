@@ -1,9 +1,7 @@
 var http = require('http');
 var url = require('url'); //모듈
-var qs = require('querystring');
-var template = require('./lib/template.js');
-var db = require('./lib/db.js');
 var topic = require('./lib/topic.js');
+var author = require('./lib/author.js');
 
 //createServer은 Nodejs로 웹브라우저가 접속이 들어올 때마다 callback함수를 Nodejs가 호출
 //request(요청할 때 웹브라우저가 보낸 정보들), response(응답할 때 우리가 웹브라우저에게 전송할 정보들)
@@ -27,7 +25,9 @@ var app = http.createServer(function(request, response){
       topic.update_process(request, response);
     } else if(pathname === '/delete_process') {
       topic.delete_process(request, response);
-    } else {
+    } else if(pathname === '/author') {
+      author.home(request, response);
+    }else {
         response.writeHead(404);  //파일을 찾을 수 없음
         response.end('Not found');  //Not found을 보여줌
       }
