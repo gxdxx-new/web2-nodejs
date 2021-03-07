@@ -31,6 +31,8 @@ var app = http.createServer(function(request, response){
       author.create_process(request, response);
     } else if(pathname === '/author/update') {
       author.update(request, response);
+    } else if(pathname === '/author/update_process') {
+      author.update_process(request, response);
     } else {
         response.writeHead(404);  //파일을 찾을 수 없음
         response.end('Not found');  //Not found을 보여줌
