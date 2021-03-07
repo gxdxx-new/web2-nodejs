@@ -27,7 +27,9 @@ var app = http.createServer(function(request, response){
       topic.delete_process(request, response);
     } else if(pathname === '/author') {
       author.home(request, response);
-    }else {
+    } else if(pathname === '/author/create_process') {
+      author.create_process(request, response);
+    } else {
         response.writeHead(404);  //파일을 찾을 수 없음
         response.end('Not found');  //Not found을 보여줌
       }
