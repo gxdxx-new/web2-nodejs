@@ -7,11 +7,11 @@ var author = require('./lib/author.js');
 
 //app.get('/', (req, res) => res.send('Hello World!'))
 app.get('/', function(request, response) { //routing
-  return response.send('/');
+  topic.home(request, response);
 });
 
-app.get('/page', function(request, response) { //routing
-  return response.send('/page');
+app.get('/page/:pageId', function(request, response) { //routing
+  response.send(request.params);  //request.params => :pageId에 들어있는 값
 });
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
