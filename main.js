@@ -5,7 +5,7 @@ var author = require('./lib/author.js');
 
 //createServer은 Nodejs로 웹브라우저가 접속이 들어올 때마다 callback함수를 Nodejs가 호출
 //request(요청할 때 웹브라우저가 보낸 정보들), response(응답할 때 우리가 웹브라우저에게 전송할 정보들)
-var app = http.createServer(function(request, response){
+var app = http.createServer(function(request, response) {
     var _url = request.url;
     var queryData = url.parse(_url, true).query;
     var pathname = url.parse(_url, true).pathname;
