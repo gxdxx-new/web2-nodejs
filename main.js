@@ -11,7 +11,8 @@ app.get('/', function(request, response) { //routing
 });
 
 app.get('/page/:pageId', function(request, response) { //routing
-  response.send(request.params);  //request.params => :pageId에 들어있는 값
+  topic.page(request, response);
+  //response.send(request.params);  //request.params => :pageId에 들어있는 값
 });
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
