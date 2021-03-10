@@ -1,13 +1,17 @@
 const express = require('express')
 const app = express()
+var http = require('http');
+var url = require('url'); //모듈
+var topic = require('./lib/topic.js');
+var author = require('./lib/author.js');
 
 //app.get('/', (req, res) => res.send('Hello World!'))
-app.get('/', function(req, res) { //routing
-  return res.send('/')
+app.get('/', function(request, response) { //routing
+  return response.send('/');
 });
 
-app.get('/page', function(req, res) { //routing
-  return res.send('/page')
+app.get('/page', function(request, response) { //routing
+  return response.send('/page');
 });
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
