@@ -15,6 +15,14 @@ app.get('/page/:pageId', function(request, response) { //routing
   //response.send(request.params);  //request.params => :pageId에 들어있는 값
 });
 
+app.get('/create', function(request, response) {
+  topic.create(request, response);
+});
+
+app.post('/create_process', function(request, response) { //topic.create에서 post방식으로 전송됨
+  topic.create_process(request, response);
+});
+
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
 
 /*
