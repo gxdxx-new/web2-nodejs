@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/gxdxx/web2-nodejs#readme",
   "dependencies": {
+    "express": "^4.17.1",
     "mysql": "^2.18.1",
     "sanitize-html": "^2.3.2"
   }

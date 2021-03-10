@@ -1,3 +1,11 @@
+const express = require('express')
+const app = express()
+
+app.get('/', (req, res) => res.send('Hello World!'))
+
+app.listen(3000, () => console.log('Example app listening on port 3000!'))
+
+/*
 var http = require('http');
 var url = require('url'); //모듈
 var topic = require('./lib/topic.js');
@@ -42,3 +50,4 @@ var app = http.createServer(function(request, response) {
 });
 
 app.listen(3000); //localhost:3000
+*/
