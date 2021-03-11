@@ -23,6 +23,14 @@ app.post('/create_process', function(request, response) { //topic.create에서 p
   topic.create_process(request, response);
 });
 
+app.get('/update/:pageId', function(request, response) {
+  topic.update(request, response);
+});
+
+app.post('/update_process', function(request, response) {
+  topic.update_process(request, response);
+})
+
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
 
 /*
