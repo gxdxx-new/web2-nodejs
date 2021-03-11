@@ -5,7 +5,10 @@ var author = require('./lib/author.js');
 var express = require('express');
 var app = express()
 var bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({extended: false}));  //미들웨어가 실행됨(사용자가 전송한 post data를 내부적으로 분석해서 callback함수의 request객체의 body property를 넘김)
+var compression = require('compression');
+
+app.use(bodyParser.urlencoded({extended: false}));  //bodyParser미들웨어가 실행됨(사용자가 전송한 post data를 내부적으로 분석해서 callback함수의 request객체의 body property를 넘김)
+app.use(compression()); //compression()을 호출하면 compression미들웨어를 리턴하고 app.use에 들어감
 
 //app.get('/', (req, res) => res.send('Hello World!'))
 app.get('/', function(request, response) { //routing
