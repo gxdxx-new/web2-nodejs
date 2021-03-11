@@ -31,6 +31,10 @@ app.post('/update_process', function(request, response) {
   topic.update_process(request, response);
 })
 
+app.post('/delete_process', function(request, response) {
+  topic.delete_process(request, response);
+})
+
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
 
 /*
