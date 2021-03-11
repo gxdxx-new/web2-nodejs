@@ -1,9 +1,11 @@
-const express = require('express')
-const app = express()
 var http = require('http');
 var url = require('url'); //모듈
 var topic = require('./lib/topic.js');
 var author = require('./lib/author.js');
+var express = require('express');
+var app = express()
+var bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({extended: false}));  //미들웨어가 실행됨(사용자가 전송한 post data를 내부적으로 분석해서 callback함수의 request객체의 body property를 넘김)
 
 //app.get('/', (req, res) => res.send('Hello World!'))
 app.get('/', function(request, response) { //routing
