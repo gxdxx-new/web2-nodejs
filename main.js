@@ -5,6 +5,7 @@ var express = require('express');
 var app = express()
 var bodyParser = require('body-parser');
 var compression = require('compression');
+var indexRouter = require('./routes/index.js');
 var topicRouter = require('./routes/topic.js');
 
 app.use(express.static('public'));  //정적인 파일을 서비스 하기 위한 public 디렉토리 안에서 static 파일을 찾음(안전해짐)
@@ -18,14 +19,8 @@ app.get('*', function(request, response, next) {  //get 방식으로 들어오�
   });
 });
 
+app.use('/', indexRouter);
 app.use('/topic', topicRouter); // /topic으로 시작하는 주소들에게 topicRouter라는 이름의 미들웨어를 적용
-
-//app.get('/', (req, res) => res.send('Hello World!'))
-app.get('/', function(request, response) { //routing
-  topic.home(request, response);
-});
-
-
 
 app.use(function(request, response, next) { //미들웨어는 순차적으로 실행되기 때문에 위에서 실행이 안되고 여기까지 오게되면 못찾은거여서 에러처리
   response.status(404).send('Sorry cant find that!');
