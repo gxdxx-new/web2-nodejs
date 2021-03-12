@@ -6,13 +6,14 @@ var app = express()
 var bodyParser = require('body-parser');
 var compression = require('compression');
 
+app.use(express.static('public'));  //정적인 파일을 서비스 하기 위한 public 디렉토리 안에서 static 파일을 찾음(안전해짐)
 app.use(bodyParser.urlencoded({extended: false}));  //bodyParser미들웨어가 실행됨(사용자가 전송한 post data를 내부적으로 분석해서 callback함수의 request객체의 body property를 넘김)
 app.use(compression()); //compression()을 호출하면 compression미들웨어를 리턴하고 app.use에 들어감
 app.get('*', function(request, response, next) {  //get 방식으로 들어오는 모든(*) 요청에 대해서만 처리
   db.query(`SELECT * FROM topic`, function(error, topics) {
     if(error) throw error;
     request.list = topics;
-    next();
+    next(); //다음에 실행되어야 할 미들웨어를 실행할지를 이전 미들웨어가 결정
   });
 });
 
