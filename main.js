@@ -22,7 +22,27 @@ app.get('/', function(request, response) { //routing
   topic.home(request, response);
 });
 
-app.get('/page/:pageId', function(request, response, next) { //routing
+app.get('/topic/create', function(request, response) {
+  topic.create(request, response);
+});
+
+app.post('/topic/create_process', function(request, response) { //topic.create에서 post방식으로 전송됨
+  topic.create_process(request, response);
+});
+
+app.get('/topic/update/:pageId', function(request, response) {
+  topic.update(request, response);
+});
+
+app.post('/topic/update_process', function(request, response) {
+  topic.update_process(request, response);
+})
+
+app.post('/topic/delete_process', function(request, response) {
+  topic.delete_process(request, response);
+})
+
+app.get('/topic/:pageId', function(request, response, next) { //routing
   db.query(`SELECT * FROM topic LEFT JOIN author ON topic.author_id=author.id WHERE topic.id=?`, [request.params.pageId], function(error, topic1) { //보안을 위해 sql문에 ?로 두번째 인자가 치환되도록 함(?은 문자가 돼서 DROP문을 입력해도 문자로 처리해서 공격을 막을 수 있음)
     if(error) {
         next(error);
@@ -34,31 +54,11 @@ app.get('/page/:pageId', function(request, response, next) { //routing
         if(error) {
           console.log('error occuered!')
           next(error);
-        }
+        }   
       }
     }
   });
 });
-
-app.get('/create', function(request, response) {
-  topic.create(request, response);
-});
-
-app.post('/create_process', function(request, response) { //topic.create에서 post방식으로 전송됨
-  topic.create_process(request, response);
-});
-
-app.get('/update/:pageId', function(request, response) {
-  topic.update(request, response);
-});
-
-app.post('/update_process', function(request, response) {
-  topic.update_process(request, response);
-})
-
-app.post('/delete_process', function(request, response) {
-  topic.delete_process(request, response);
-})
 
 app.use(function(request, response, next) { //미들웨어는 순차적으로 실행되기 때문에 위에서 실행이 안되고 여기까지 오게되면 못찾은거여서 에러처리
   response.status(404).send('Sorry cant find that!');
