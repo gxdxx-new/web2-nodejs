@@ -5,6 +5,7 @@ var express = require('express');
 var app = express()
 var bodyParser = require('body-parser');
 var compression = require('compression');
+var topicRouter = require('./routes/topic.js');
 
 app.use(express.static('public'));  //정적인 파일을 서비스 하기 위한 public 디렉토리 안에서 static 파일을 찾음(안전해짐)
 app.use(bodyParser.urlencoded({extended: false}));  //bodyParser미들웨어가 실행됨(사용자가 전송한 post data를 내부적으로 분석해서 callback함수의 request객체의 body property를 넘김)
@@ -17,48 +18,14 @@ app.get('*', function(request, response, next) {  //get 방식으로 들어오�
   });
 });
 
+app.use('/topic', topicRouter); // /topic으로 시작하는 주소들에게 topicRouter라는 이름의 미들웨어를 적용
+
 //app.get('/', (req, res) => res.send('Hello World!'))
 app.get('/', function(request, response) { //routing
   topic.home(request, response);
 });
 
-app.get('/topic/create', function(request, response) {
-  topic.create(request, response);
-});
 
-app.post('/topic/create_process', function(request, response) { //topic.create에서 post방식으로 전송됨
-  topic.create_process(request, response);
-});
-
-app.get('/topic/update/:pageId', function(request, response) {
-  topic.update(request, response);
-});
-
-app.post('/topic/update_process', function(request, response) {
-  topic.update_process(request, response);
-})
-
-app.post('/topic/delete_process', function(request, response) {
-  topic.delete_process(request, response);
-})
-
-app.get('/topic/:pageId', function(request, response, next) { //routing
-  db.query(`SELECT * FROM topic LEFT JOIN author ON topic.author_id=author.id WHERE topic.id=?`, [request.params.pageId], function(error, topic1) { //보안을 위해 sql문에 ?로 두번째 인자가 치환되도록 함(?은 문자가 돼서 DROP문을 입력해도 문자로 처리해서 공격을 막을 수 있음)
-    if(error) {
-        next(error);
-    } else{
-      try {
-      topic.page(request, response, topic1);
-      //response.send(request.params);  //request.params => :pageId에 들어있는 값
-      } catch(error) {
-        if(error) {
-          console.log('error occuered!')
-          next(error);
-        }   
-      }
-    }
-  });
-});
 
 app.use(function(request, response, next) { //미들웨어는 순차적으로 실행되기 때문에 위에서 실행이 안되고 여기까지 오게되면 못찾은거여서 에러처리
   response.status(404).send('Sorry cant find that!');
