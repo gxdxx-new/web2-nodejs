@@ -1,5 +1,4 @@
-var http = require('http');
-var url = require('url'); //모듈
+var db = require('./lib/db');
 var topic = require('./lib/topic.js');
 var author = require('./lib/author.js');
 var express = require('express');
@@ -9,6 +8,13 @@ var compression = require('compression');
 
 app.use(bodyParser.urlencoded({extended: false}));  //bodyParser미들웨어가 실행됨(사용자가 전송한 post data를 내부적으로 분석해서 callback함수의 request객체의 body property를 넘김)
 app.use(compression()); //compression()을 호출하면 compression미들웨어를 리턴하고 app.use에 들어감
+app.get('*', function(request, response, next) {  //get 방식으로 들어오는 모든(*) 요청에 대해서만 처리
+  db.query(`SELECT * FROM topic`, function(error, topics) {
+    if(error) throw error;
+    request.list = topics;
+    next();
+  });
+});
 
 //app.get('/', (req, res) => res.send('Hello World!'))
 app.get('/', function(request, response) { //routing
