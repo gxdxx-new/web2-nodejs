@@ -1,5 +1,6 @@
 var db = require('../lib/db.js');
 var template = require('../lib/template.js');
+var auth = require('../lib/auth.js');
 var sanitizeHtml = require('sanitize-html');
 var express = require('express');
 var router = express.Router();
@@ -37,7 +38,8 @@ router.get('/create', function(request, response, next) {
               <input type="submit"> <!--전송버튼-->
             </p>
           </form>`,
-          `<a href="/topic/create">create</a>`
+          `<a href="/topic/create">create</a>`,
+          auth.authStatusUI(request, response)
         );
         response.send(html);
       }
@@ -85,7 +87,8 @@ router.get('/update/:pageId', function(request, response, next) {
             </form>
             `,
             `<a href="/topic/create">create</a>
-              <a href="/topic/update/${topic[0].id}">update</a>`
+              <a href="/topic/update/${topic[0].id}">update</a>`,
+              auth.authStatusUI(request, response)
           );
           response.send(html);
         }
@@ -137,7 +140,8 @@ router.get('/:pageId', function(request, response, next) { //routing
         <input type="hidden" name="id" value="${request.params.pageId}">
         <input type="submit" value="delete">  <!--delete란 이름의 버튼 생성-->
         </form>
-         `
+         `,
+         auth.authStatusUI(request, response)
       );
       response.send(html);
     }

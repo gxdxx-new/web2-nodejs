@@ -15,7 +15,7 @@ router.get('/', function(request, response) { //routing
             <p><input type="submit"></p>
         </form>
         `,
-        `<a href="/topic/create">create</a>` ///create로 이동, home에서는 update 버튼 안나오게
+        `<a href="/topic/create">create</a>`, ///create로 이동, home에서는 update 버튼 안나오게
     );
     response.send(html);
 });

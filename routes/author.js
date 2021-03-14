@@ -1,5 +1,6 @@
 var db = require('../lib/db.js');
 var template = require('../lib/template.js');
+var auth = require('../lib/auth.js');
 var sanitizeHtml = require('sanitize-html');
 var express = require('express');
 var router = express.Router();
@@ -45,7 +46,8 @@ router.get('/', function(request, response, next) {
                     </p>
                 </form>
                 `,
-                ``
+                ``,
+                auth.authStatusUI(request, response)
             );
             response.send(html);
         }
@@ -104,7 +106,8 @@ router.get('/update/:pageId', function(request, response, next) {
                                     </p>
                                 </form>
                                 `,
-                                ``
+                                ``,
+                                auth.authStatusUI(request, response)
                             );
                             response.send(html);
                         }
