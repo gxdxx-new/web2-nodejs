@@ -17,6 +17,10 @@ router.get('*', function(request, response, next) {  //get 방식으로 들어�
 });
 
 router.get('/create', function(request, response, next) {
+  if(auth.authIsOwner(request, response) === false) {
+    response.send('Login require!!!');
+    return false;
+  }
   db.query(`SELECT * FROM author`, function(error, authors) {
       if(error) {
         next(error);
@@ -47,6 +51,10 @@ router.get('/create', function(request, response, next) {
 });
   
 router.post('/create_process', function(request, response, next) { //topic.create에서 post방식으로 전송됨
+  if(auth.authIsOwner(request, response) === false) {
+    response.send('Login require!!!');
+    return false;
+  }
   var post = request.body;
   db.query(`INSERT INTO topic (title, description, created, author_id) VALUES(?, ?, NOW(), ?);`, 
     [post.title, post.description, post.author], 
@@ -61,6 +69,10 @@ router.post('/create_process', function(request, response, next) { //topic.creat
 });
   
 router.get('/update/:pageId', function(request, response, next) {
+  if(auth.authIsOwner(request, response) === false) {
+    response.send('Login require!!!');
+    return false;
+  }
   db.query(`SELECT * FROM topic WHERE id=?`, [request.params.pageId], function(error, topic) {
     if(error) {
       next(error);
@@ -98,6 +110,10 @@ router.get('/update/:pageId', function(request, response, next) {
 });
   
 router.post('/update_process', function(request, response, next) {
+  if(auth.authIsOwner(request, response) === false) {
+    response.send('Login require!!!');
+    return false;
+  }
   var post = request.body;
   db.query(`UPDATE topic SET title=?, description=?, author_id=? WHERE id=?`,
     [post.title, post.description, post.author, post.id],
@@ -111,6 +127,10 @@ router.post('/update_process', function(request, response, next) {
 })
   
 router.post('/delete_process', function(request, response, next) {
+  if(auth.authIsOwner(request, response) === false) {
+    response.send('Login require!!!');
+    return false;
+  }
   var post = request.body;
   db.query(`DELETE FROM topic WHERE id=?`, [post.id], function(error, result) {  //삭제할 때는 id만 전송됨
     if(error) {
@@ -122,6 +142,10 @@ router.post('/delete_process', function(request, response, next) {
 })
   
 router.get('/:pageId', function(request, response, next) { //routing
+  if(auth.authIsOwner(request, response) === false) {
+    response.send('Login require!!!');
+    return false;
+  }
   db.query(`SELECT * FROM topic LEFT JOIN author ON topic.author_id=author.id WHERE topic.id=?`, [request.params.pageId], function(error, topic) { //보안을 위해 sql문에 ?로 두번째 인자가 치환되도록 함(?은 문자가 돼서 DROP문을 입력해도 문자로 처리해서 공격을 막을 수 있음)
     if(error) {
       next(error);

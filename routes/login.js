@@ -34,6 +34,10 @@ router.post('/login_process', function(request, response) {
 });
 
 router.get('/logout_process', function(request, response) {
+    if(auth.authIsOwner(request, response) === false) {
+        response.send('Login require!!!');
+        return false;
+      }
     response.cookie('email', ``, {maxAge: 0});
     response.cookie('password', ``, {maxAge: 0});
     response.cookie('nickname', '', {maxAge: 0});
