@@ -1,5 +1,5 @@
-var db = require('../lib/db.js');
 var template = require('../lib/template.js');
+var auth = require('../lib/auth.js');
 var express = require('express');
 var router = express.Router();
 
@@ -16,11 +16,12 @@ router.get('/', function(request, response) { //routing
         </form>
         `,
         `<a href="/topic/create">create</a>`, ///create로 이동, home에서는 update 버튼 안나오게
+        auth.authStatusUI(request, response)
     );
     response.send(html);
 });
 
-router.post('/login_process', function(request, response, next) { //topic.create에서 post방식으로 전송됨
+router.post('/login_process', function(request, response) {
     var post = request.body;
     if(post.email === 'nkd0310@naver.com' && post.password === '000000') {
         response.cookie('email', `${post.email}`);
@@ -30,6 +31,13 @@ router.post('/login_process', function(request, response, next) { //topic.create
     } else {
         response.send('Who?');
     }
+});
+
+router.get('/logout_process', function(request, response) {
+    response.cookie('email', ``, {maxAge: 0});
+    response.cookie('password', ``, {maxAge: 0});
+    response.cookie('nickname', '', {maxAge: 0});
+    response.redirect('/');
 });
 
 module.exports = router;
