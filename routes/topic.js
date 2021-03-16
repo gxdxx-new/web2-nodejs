@@ -7,7 +7,7 @@ var router = express.Router();
 
 router.get('*', function(request, response, next) {  //get 방식으로 들어오는 모든(*) 요청에 대해서만 처리
   if(auth.isOwner(request, response) === false) {
-    response.send('Login require!!!');
+    response.redirect('/');
     return false;
   }  
   db.query(`SELECT * FROM topic`, function(error, topics) {
@@ -22,7 +22,7 @@ router.get('*', function(request, response, next) {  //get 방식으로 들어�
 
 router.post('*', function(request, response, next) {
   if(auth.isOwner(request, response) === false) {
-      response.send('Login require!!!');
+    response.redirect('/');
       return false;
   }
   next();
