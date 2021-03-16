@@ -2,6 +2,7 @@ var template = require('../lib/template.js');
 var auth = require('../lib/auth.js');
 var express = require('express');
 var router = express.Router();
+var app = express()
 
 //app.get('/', (req, res) => res.send('Hello World!'))
 router.get('/', function(request, response) { //routing
