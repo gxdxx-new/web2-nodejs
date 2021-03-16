@@ -6,6 +6,10 @@ var express = require('express');
 var router = express.Router();
 
 router.get('*', function(request, response, next) {  //get 방식으로 들어오는 모든(*) 요청에 대해서만 처리
+    if(auth.isOwner(request, response) === false) {
+        response.send('Login require!!!');
+        return false;
+    }
     db.query(`SELECT * FROM topic`, function(error, topics) {
       if(error) {
         next(error);
@@ -15,6 +19,14 @@ router.get('*', function(request, response, next) {  //get 방식으로 들어�
       }
     });
   });
+
+router.post('*', function(request, response, next) {
+    if(auth.isOwner(request, response) === false) {
+        response.send('Login require!!!');
+        return false;
+    }
+    next();
+})
 
 router.get('/', function(request, response, next) {
     db.query(`SELECT * FROM author`, function(error, authors) {

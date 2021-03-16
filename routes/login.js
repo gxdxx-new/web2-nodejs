@@ -16,7 +16,7 @@ router.get('/', function(request, response) { //routing
         </form>
         `,
         `<a href="/topic/create">create</a>`, ///create로 이동, home에서는 update 버튼 안나오게
-        auth.authStatusUI(request, response)
+        auth.statusUI(request, response)
     );
     response.send(html);
 });
@@ -33,14 +33,13 @@ router.post('/login_process', function(request, response) {
 });
 
 router.get('/logout_process', function(request, response) {
-    if(auth.authIsOwner(request, response) === false) {
+    if(auth.isOwner(request, response) === false) {
         response.send('Login require!!!');
         return false;
-      }
-    response.cookie('email', ``, {maxAge: 0});
-    response.cookie('password', ``, {maxAge: 0});
-    response.cookie('nickname', '', {maxAge: 0});
-    response.redirect('/');
+    }
+    request.session.destroy(function(error) {
+        response.redirect('/');
+    })
 });
 
 module.exports = router;
