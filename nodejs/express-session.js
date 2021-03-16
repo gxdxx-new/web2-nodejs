@@ -5,31 +5,18 @@ var session = require('express-session');
 var app = express();
 
 app.use(session({
-    secret: 'keyboard cat',
-    resave: false,
-    saveUninitialized: true
+    secret: 'kASDSADSADASDWDQ@O!!@',
+    resave: false,  //false: 세션 데이터가 바뀌기 전 까지는 세션 저장소 값을 저장하지 않음
+    saveUninitialized: true //세션이 필요하기 전 까지는 세션을 구동시키지 않음
 }));
 
-app.use(function (request, response, next) {
-    if(!request.session.views) {
-        request.session.views = {}
+app.get('/', function(request, response, next) {
+    if(request.session.num === undefined) {
+        request.session.num = 1;
+    } else {
+        request.session.num++;
     }
-
-    //get the url pathname
-    var pathname = parseurl(request).pathname;
-
-    //count the views
-    request.session.views[pathname] = (request.session.views[pathname] || 0) + 1
-
-    next();
-});
-
-app.get('/foo', function(request, response, next) {
-    response.send('you viewed this page ' + request.session.views['/foo'] + ' times');
-});
-
-app.get('/bar', function(request, response, next) {
-    response.send('you viewed this page ' + request.session.views['/bar'] + ' times');
+    response.send(`Views : ${request.session.num}`);
 })
 
 app.listen(3000, function() {
