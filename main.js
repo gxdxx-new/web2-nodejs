@@ -32,6 +32,9 @@ app.use(
     })
 );
 
+var passport = require('passport'); //session 뒤에 와야됨
+var LocalStrategy = require('passport-local').Strategy;
+
 app.use(helmet());
 
 app.use(express.static('public'));  //정적인 파일을 서비스 하기 위한 public 디렉토리 안에서 static 파일을 찾음(안전해짐)
