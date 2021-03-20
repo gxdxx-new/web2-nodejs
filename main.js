@@ -32,8 +32,14 @@ app.use(
     })
 );
 
-var passport = require('passport'); //session 뒤에 와야됨
-var LocalStrategy = require('passport-local').Strategy;
+var passport = require('passport') //session 뒤에 와야됨
+  , LocalStrategy = require('passport-local').Strategy;
+
+app.post('/login/login_process',
+    passport.authenticate('local', {  //local: username, password을 이용
+      successRedirect: '/',
+      failureRedirect: '/login'
+    }));
 
 app.use(helmet());
 
