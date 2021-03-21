@@ -43,20 +43,20 @@ var authData = {
   nickname: 'gidon'
 };
 
-var passport = require('passport'), //session 뒤에 와야됨
+var passport = require('passport'), //session 뒤에 와야됨, passport 설치
   LocalStrategy = require('passport-local').Strategy;
 
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.initialize()); //passport express 설치
+app.use(passport.session());  //session을 내부적으로 사용 가능
 
-passport.serializeUser(function(user, done) {
-  // done(null, user.id);
+passport.serializeUser(function(user, done) { //로그인에 성공했을 때 딱 한번 호출되면서 사용자의 식별자를 저장
+  console.log('serializable:', user);
+  done(null, user.email); //sessions 테이블에 저장됨
 });
 
-passport.deserializeUser(function(id, done) {
-  // user.findById(id, function(erorr, user) {
-  //   done(error, user);
-  // });
+passport.deserializeUser(function(id, done) { //로그인 후 각각의 페이지를 방문할 때 마다 로그인한 사용자인지 아닌지를 체크 
+  console.log('deserializable:', id);
+  done(null, authData);
 });
 
 passport.use(new LocalStrategy(
@@ -69,7 +69,7 @@ passport.use(new LocalStrategy(
       console.log(1);
       if(password === authData.password) {
         console.log(2);
-        return done(null, authData);
+        return done(null, authData);  //passport.serializeUser()에 authData가 주입됨
       } else {
         console.log(3);
         return done(null, false, {
