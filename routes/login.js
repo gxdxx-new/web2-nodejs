@@ -2,8 +2,8 @@ var template = require('../lib/template.js');
 var auth = require('../lib/auth.js');
 var express = require('express');
 var router = express.Router();
-var app = express()
 
+module.exports = function(passport) {
 //app.get('/', (req, res) => res.send('Hello World!'))
 router.get('/', function(request, response) { //routing
     var fmsg = request.flash();
@@ -28,6 +28,14 @@ router.get('/', function(request, response) { //routing
     response.send(html);
 });
 
+router.post('/login_process',  //  login폼에서 전송한 데이터를 passport가 받도록 함
+  passport.authenticate('local', {  //local: username, password을 이용
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: true,
+    successFlash: true
+  }
+));
 // router.post('/login_process', function(request, response) {
 //     var post = request.body;
 //     if(post.email === 'nkd0310@naver.com' && post.password === '000000') {
@@ -55,4 +63,5 @@ router.get('/logout_process', function(request, response) {
     });
 });
 
-module.exports = router;
+return router;
+}
