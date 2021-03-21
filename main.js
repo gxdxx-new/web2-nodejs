@@ -12,6 +12,11 @@ var helmet = require('helmet');
 var session = require('express-session');
 var MySQLStore = require('express-mysql-session')(session);
 
+app.use(express.static('public'));  //정적인 파일을 서비스 하기 위한 public 디렉토리 안에서 static 파일을 찾음(안전해짐)
+app.use(bodyParser.urlencoded({extended: false}));  //bodyParser미들웨어가 실행됨(사용자가 전송한 *post* data를 내부적으로 분석해서 callback함수의 request객체의 body property를 넘김)
+app.use(compression()); //compression()을 호출하면 compression미들웨어를 리턴하고 app.use에 들어감
+app.use(helmet());
+
 var options ={
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -32,8 +37,14 @@ app.use(
     })
 );
 
+var authData = {
+  email: 'nkd0310@naver.com',
+  password: '000000',
+  nickname: 'gidon'
+};
+
 var passport = require('passport'), //session 뒤에 와야됨
-LocalStrategy = require('passport-local').Strategy;
+  LocalStrategy = require('passport-local').Strategy;
 
 passport.use(new LocalStrategy(
   {
@@ -41,25 +52,23 @@ passport.use(new LocalStrategy(
     passwordField: 'password'
   },
   function(username, password, done) {
-    console.log('LocalStrategy', username, password)
-    // User.findOne({
-    //   username: username
-    // }, function(error, user) {
-    //   if(error) {
-    //     return done(error);
-    //   }
-    //   if(!user) {
-    //     return done(null, false, {
-    //       message: 'Incorrect username.'
-    //     });
-    //   }
-    //   if(!user.validPassword(password)) {
-    //     return done(null, false, {
-    //       message: 'Incorrect password.'
-    //     });
-    //   }
-    //   return done(null, user);
-    // });
+    if(username === authData.email) { //username:사용자가 입력한 값
+      console.log(1);
+      if(password === authData.password) {
+        console.log(2);
+        return done(null, authData);
+      } else {
+        console.log(3);
+        return done(null, false, {
+          message: 'Incorrect password.'
+        });
+      }
+    } else {
+      console.log(4);
+      return done(null, false, {
+        message: 'Incorrect username.'
+      });
+    }
   }
 ));
 
@@ -68,12 +77,6 @@ app.post('/login/login_process',  //  login폼에서 전송한 데이터를 pass
       successRedirect: '/',
       failureRedirect: '/login'
     }));
-
-app.use(helmet());
-
-app.use(express.static('public'));  //정적인 파일을 서비스 하기 위한 public 디렉토리 안에서 static 파일을 찾음(안전해짐)
-app.use(bodyParser.urlencoded({extended: false}));  //bodyParser미들웨어가 실행됨(사용자가 전송한 *post* data를 내부적으로 분석해서 callback함수의 request객체의 body property를 넘김)
-app.use(compression()); //compression()을 호출하면 compression미들웨어를 리턴하고 app.use에 들어감
 
 // app.use(
 //   session({
