@@ -11,6 +11,7 @@ var loginRouter = require('./routes/login.js');
 var helmet = require('helmet');
 var session = require('express-session');
 var MySQLStore = require('express-mysql-session')(session);
+var flash = require('connect-flash');
 
 app.use(express.static('public'));  //정적인 파일을 서비스 하기 위한 public 디렉토리 안에서 static 파일을 찾음(안전해짐)
 app.use(bodyParser.urlencoded({extended: false}));  //bodyParser미들웨어가 실행됨(사용자가 전송한 *post* data를 내부적으로 분석해서 callback함수의 request객체의 body property를 넘김)
@@ -36,6 +37,17 @@ app.use(
       store: new MySQLStore(sessionStore.options)
     })
 );
+app.use(flash()); //session을 사용해서 session 다음에 나와야됨
+app.get('/flash', function(request, response) {
+  request.flash('msg', 'Flash is back!!');
+  response.send('flash');
+});
+
+app.get('/flash-display', function(request, response) {
+  var fmsg = request.flash();
+  console.log(fmsg);
+  response.send(fmsg);
+});
 
 var authData = {
   email: 'nkd0310@naver.com',
