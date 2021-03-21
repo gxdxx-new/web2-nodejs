@@ -46,6 +46,19 @@ var authData = {
 var passport = require('passport'), //session 뒤에 와야됨
   LocalStrategy = require('passport-local').Strategy;
 
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(function(user, done) {
+  // done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  // user.findById(id, function(erorr, user) {
+  //   done(error, user);
+  // });
+});
+
 passport.use(new LocalStrategy(
   {
     usernameField: 'email',

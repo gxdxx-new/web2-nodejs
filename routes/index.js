@@ -17,6 +17,7 @@ router.get('*', function(request, response, next) {  //get 방식으로 들어�
 
 //app.get('/', (req, res) => res.send('Hello World!'))
 router.get('/', function(request, response) { //routing
+    console.log('/', request.user); 
     var title = 'Welcome';
     var description = 'Hello, Node.js';
     var list = template.list(request.list);
