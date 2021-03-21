@@ -40,9 +40,13 @@ router.get('/logout_process', function(request, response) {
         response.redirect('/');
         return false;
     }
-    request.session.destroy(function(error) {
+    request.logout();   //passport에서 로그아웃을 하고
+    // request.session.destroy(function(error) {   //세션을 지운 다음
+    //     response.redirect('/'); //리다이렉트
+    // });
+    request.session.save(function() {   //현재 세션의 상태를 MySQLStore에 저장
         response.redirect('/');
-    })
+    });
 });
 
 module.exports = router;
