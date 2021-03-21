@@ -56,7 +56,7 @@ passport.serializeUser(function(user, done) { //로그인에 성공했을 때 �
 
 passport.deserializeUser(function(id, done) { //로그인 후 각각의 페이지를 방문할 때 마다 로그인한 사용자인지 아닌지를 체크 
   console.log('deserializable:', id);
-  done(null, authData);
+  done(null, authData); //authData가 /routes/index.js의 request로 들어감
 });
 
 passport.use(new LocalStrategy(
