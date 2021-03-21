@@ -32,10 +32,38 @@ app.use(
     })
 );
 
-var passport = require('passport') //session 뒤에 와야됨
-  , LocalStrategy = require('passport-local').Strategy;
+var passport = require('passport'), //session 뒤에 와야됨
+LocalStrategy = require('passport-local').Strategy;
 
-app.post('/login/login_process',
+passport.use(new LocalStrategy(
+  {
+    usernameField: 'email',
+    passwordField: 'password'
+  },
+  function(username, password, done) {
+    console.log('LocalStrategy', username, password)
+    // User.findOne({
+    //   username: username
+    // }, function(error, user) {
+    //   if(error) {
+    //     return done(error);
+    //   }
+    //   if(!user) {
+    //     return done(null, false, {
+    //       message: 'Incorrect username.'
+    //     });
+    //   }
+    //   if(!user.validPassword(password)) {
+    //     return done(null, false, {
+    //       message: 'Incorrect password.'
+    //     });
+    //   }
+    //   return done(null, user);
+    // });
+  }
+));
+
+app.post('/login/login_process',  //  login폼에서 전송한 데이터를 passport가 받도록 함
     passport.authenticate('local', {  //local: username, password을 이용
       successRedirect: '/',
       failureRedirect: '/login'
