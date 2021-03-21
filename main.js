@@ -38,16 +38,16 @@ app.use(
     })
 );
 app.use(flash()); //session을 사용해서 session 다음에 나와야됨
-app.get('/flash', function(request, response) {
-  request.flash('msg', 'Flash is back!!');
-  response.send('flash');
-});
+// app.get('/flash', function(request, response) {
+//   request.flash('msg', 'Flash is back!!');
+//   response.send('flash');
+// });
 
-app.get('/flash-display', function(request, response) {
-  var fmsg = request.flash();
-  console.log(fmsg);
-  response.send(fmsg);
-});
+// app.get('/flash-display', function(request, response) {
+//   var fmsg = request.flash();
+//   console.log(fmsg);
+//   response.send(fmsg);
+// });
 
 var authData = {
   email: 'nkd0310@naver.com',
@@ -81,8 +81,11 @@ passport.use(new LocalStrategy(
       console.log(1);
       if(password === authData.password) {
         console.log(2);
-        return done(null, authData);  //passport.serializeUser()에 authData가 주입됨
-      } else {
+        return done(null, authData, {
+          message: 'Welcome!!'
+        });
+      }  //passport.serializeUser()에 authData가 주입됨
+      else {
         console.log(3);
         return done(null, false, {
           message: 'Incorrect password.'
@@ -100,7 +103,9 @@ passport.use(new LocalStrategy(
 app.post('/login/login_process',  //  login폼에서 전송한 데이터를 passport가 받도록 함
     passport.authenticate('local', {  //local: username, password을 이용
       successRedirect: '/',
-      failureRedirect: '/login'
+      failureRedirect: '/login',
+      failureFlash: true,
+      successFlash: true
     }));
 
 // app.use(

@@ -6,15 +6,21 @@ var app = express()
 
 //app.get('/', (req, res) => res.send('Hello World!'))
 router.get('/', function(request, response) { //routing
+    var fmsg = request.flash();
+    var feedback = '';
+    if(fmsg.error) {
+        feedback = fmsg.error[0];
+    }
     var title = 'WEB - Login';
     var list = template.list(request.list);
     var html = template.HTML(title, list,
         `
-        <form action="/login/login_process" method="post">
-            <p><input type="text" name="email" placeholder="email"></p>
-            <p><input type="password" name="password" placeholder="password"></p>
-            <p><input type="submit" value="login"></p>
-        </form>
+            <div style="color:red;">${feedback}</div>
+            <form action="/login/login_process" method="post">
+                <p><input type="text" name="email" placeholder="email"></p>
+                <p><input type="password" name="password" placeholder="password"></p>
+                <p><input type="submit" value="login"></p>
+            </form>
         `,
         `<a href="/topic/create">create</a>`, ///create로 이동, home에서는 update 버튼 안나오게
         auth.statusUI(request, response)
