@@ -87,7 +87,16 @@ module.exports = function(passport) {
                           if(error) {
                             next(error);
                           } else {
-                            response.redirect(`/`);
+                            db.query(`SELECT * FROM users WHERE email=?`, [post.email], function(error, user1) {
+                                var user = {id:user1[0].id, email:post.email, password:post.password, displayName:post.displayName};
+                                request.login(user, function(error) {
+                                    if(error) {
+                                        next(error);
+                                    } else {
+                                        response.redirect(`/`);
+                                    }
+                                });
+                            });
                           }
                         }
                       );
