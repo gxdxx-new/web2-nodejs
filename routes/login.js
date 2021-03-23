@@ -47,5 +47,30 @@ module.exports = function(passport) {
         });
     });
 
+    router.get('/register', function(request, response) { //routing
+        var fmsg = request.flash();
+        var feedback = '';
+        if(fmsg.error) {
+            feedback = fmsg.error[0];
+        }
+        var title = 'WEB - Login';
+        var list = template.list(request.list);
+        var html = template.HTML(title, list,
+            `
+                <div style="color:red;">${feedback}</div>
+                <form action="/login/register_process" method="post">
+                    <p><input type="text" name="email" placeholder="email"></p>
+                    <p><input type="password" name="password1" placeholder="password"></p>
+                    <p><input type="password" name="password2" placeholder="password"></p>
+                    <p><input type="text" name="displayName" placeholder="display name"></p>
+                    <p><input type="submit" value="register"></p>
+                </form>
+            `,
+            `<a href="/topic/create">create</a>`, ///create로 이동, home에서는 update 버튼 안나오게
+            auth.statusUI(request, response)
+        );
+        response.send(html);
+    });
+
     return router;
 }
