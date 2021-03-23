@@ -1,13 +1,10 @@
-var session = require('express-session');
 var express = require('express');
 var app = express()
-var session = require('express-session');
 var bodyParser = require('body-parser');
 var compression = require('compression'); //데이터를 압축
 var helmet = require('helmet');
 var session = require('express-session');
-var MySQLStore = require('express-mysql-session')(session);
-var flash = require('connect-flash');
+
 var indexRouter = require('./routes/index.js');
 var topicRouter = require('./routes/topic.js');
 var authorRouter = require('./routes/author.js');
@@ -19,26 +16,6 @@ app.use(bodyParser.urlencoded({extended: false}));  //bodyParser미들웨어가 
 app.use(compression()); //compression()을 호출하면 compression미들웨어를 리턴하고 app.use에 들어감
 app.use(helmet());
 
-var options ={
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  port: process.env.SERVER_PORT,
-  database: process.env.DB_DATABASE
-};
-var sessionStore = new MySQLStore(options);
-
-app.use(
-    session({
-      HttpOnly: true,
-      secure: true,
-      secret: 'kASDSADSADASDWDQ@O!!@',
-      resave: false,  //false: 세션 데이터가 바뀌기 전 까지는 세션 저장소 값을 저장하지 않음
-      saveUninitialized: true, //세션이 필요하기 전 까지는 세션을 구동시키지 않음
-      store: new MySQLStore(sessionStore.options)
-    })
-);
-app.use(flash()); //session을 사용해서 session 다음에 나와야됨
 
 app.use('/', indexRouter);
 app.use('/topic', topicRouter); // /topic으로 시작하는 주소들에게 topicRouter라는 이름의 미들웨어를 적용
