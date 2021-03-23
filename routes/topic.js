@@ -23,7 +23,7 @@ router.get('*', function(request, response, next) {  //get 방식으로 들어�
 router.post('*', function(request, response, next) {
   if(auth.isOwner(request, response) === false) {
     response.redirect('/');
-      return false;
+    return false;
   }
   next();
 })

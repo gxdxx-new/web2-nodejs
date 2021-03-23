@@ -1,3 +1,4 @@
+var db = require('../lib/db.js');
 var template = require('../lib/template.js');
 var auth = require('../lib/auth.js');
 var express = require('express');
@@ -59,10 +60,10 @@ module.exports = function(passport) {
             `
                 <div style="color:red;">${feedback}</div>
                 <form action="/login/register_process" method="post">
-                    <p><input type="text" name="email" placeholder="email"></p>
-                    <p><input type="password" name="password1" placeholder="password"></p>
-                    <p><input type="password" name="password2" placeholder="password"></p>
-                    <p><input type="text" name="displayName" placeholder="display name"></p>
+                    <p><input type="text" name="email" placeholder="email" value="nkd0310@naver.com"></p>
+                    <p><input type="password" name="password" placeholder="password" value="000000"></p>
+                    <p><input type="password" name="password2" placeholder="password" value="000000"></p>
+                    <p><input type="text" name="displayName" placeholder="display name" value="gidon"></p>
                     <p><input type="submit" value="register"></p>
                 </form>
             `,
@@ -71,6 +72,32 @@ module.exports = function(passport) {
         );
         response.send(html);
     });
+
+    router.post('/register_process', function(request, response, next) { //topic.create에서 post방식으로 전송됨
+        var post = request.body;
+        db.query(`SELECT email FROM users WHERE email=?`, [post.email], function(error, users) {
+            if(error) {
+              next(error);
+            } else {
+                if(users[0] === undefined) {
+                    if(post.password === post.password2) {
+                        db.query(`INSERT INTO users (email, password, displayName) VALUES(?, ?, ?);`, 
+                        [post.email, post.password, post.displayName], 
+                        function(error, result) {
+                          if(error) {
+                            next(error);
+                          } else {
+                            response.redirect(`/`);
+                          }
+                        }
+                      );
+                    }
+                } else {
+                    response.redirect('/');
+                }
+            }
+        });
+      });
 
     return router;
 }
