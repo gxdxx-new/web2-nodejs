@@ -91,9 +91,13 @@ module.exports = function(passport) {
                           }
                         }
                       );
+                    } else {
+                        request.flash('error', 'Password must be the same.');
+                        response.redirect('/login/register');   
                     }
                 } else {
-                    response.redirect('/');
+                    request.flash('error', 'The same email already exists.');
+                    response.redirect('/login/register');
                 }
             }
         });

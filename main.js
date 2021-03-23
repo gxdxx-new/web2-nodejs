@@ -3,7 +3,6 @@ var app = express()
 var bodyParser = require('body-parser');
 var compression = require('compression'); //데이터를 압축
 var helmet = require('helmet');
-var session = require('express-session');
 
 var indexRouter = require('./routes/index.js');
 var topicRouter = require('./routes/topic.js');
