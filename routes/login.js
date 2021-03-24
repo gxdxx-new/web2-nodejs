@@ -3,6 +3,7 @@ var template = require('../lib/template.js');
 var auth = require('../lib/auth.js');
 var express = require('express');
 var router = express.Router();
+var bcrypt = require('bcrypt');
 
 module.exports = function(passport) {
     router.get('/', function(request, response) { //routing
@@ -75,31 +76,32 @@ module.exports = function(passport) {
 
     router.post('/register_process', function(request, response, next) { //topic.create에서 post방식으로 전송됨
         var post = request.body;
-        db.query(`SELECT email FROM users WHERE email=?`, [post.email], function(error, users) {
+        db.query(`SELECT email FROM users WHERE email=?`, [post.email], function(error, user) {
             if(error) {
               next(error);
             } else {
-                if(users[0] === undefined) {
+                if(user[0] === undefined) {
                     if(post.password === post.password2) {
-                        db.query(`INSERT INTO users (email, password, displayName) VALUES(?, ?, ?);`, 
-                        [post.email, post.password, post.displayName], 
-                        function(error, result) {
-                          if(error) {
-                            next(error);
-                          } else {
-                            db.query(`SELECT * FROM users WHERE email=?`, [post.email], function(error, user1) {
-                                var user = {id:user1[0].id, email:post.email, password:post.password, displayName:post.displayName};
-                                request.login(user, function(error) {
-                                    if(error) {
-                                        next(error);
-                                    } else {
-                                        response.redirect(`/`);
-                                    }
+                        bcrypt.hash(post.password, 10, function(error, hash) {
+                            db.query(`INSERT INTO users (email, password, displayName) VALUES(?, ?, ?);`, 
+                            [post.email, hash, post.displayName], 
+                            function(error, result) {
+                              if(error) {
+                                next(error);
+                              } else {
+                                db.query(`SELECT * FROM users WHERE email=?`, [post.email], function(error, loginUser) {
+                                    var user = {id:loginUser[0].id, email:post.email, password:hash, displayName:post.displayName};
+                                    request.login(user, function(error) {
+                                        if(error) {
+                                            next(error);
+                                        } else {
+                                            response.redirect(`/`);
+                                        }
+                                    });
                                 });
+                              }
                             });
-                          }
-                        }
-                      );
+                        });
                     } else {
                         request.flash('error', 'Password must be the same.');
                         response.redirect('/login/register');   
