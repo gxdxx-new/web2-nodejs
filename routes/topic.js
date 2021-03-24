@@ -73,9 +73,7 @@ router.get('/update/:pageId', function(request, response, next) {
     if(error) {
       next(error);
     } else {
-      console.log(topic[0].user_id);
-      console.log(request.user.id);
-      if(topic[0].user_id != request.user.id) {
+      if(parseInt(topic[0].user_id) !== parseInt(request.user.id)) {
         request.flash('error', 'Not yours.');
         return response.redirect('/');
       }
@@ -104,7 +102,7 @@ router.post('/update_process', function(request, response, next) {
     if(error) {
       next(error);
     } else {
-      if(topic[0].user_id != request.user.id) {
+      if(parseInt(topic[0].user_id) !== parseInt(request.user.id)) {
         request.flash('error', 'Not yours.');
         return response.redirect('/');
       }
@@ -121,11 +119,21 @@ router.post('/update_process', function(request, response, next) {
   
 router.post('/delete_process', function(request, response, next) {
   var post = request.body;
-  db.query(`DELETE FROM topic WHERE id=?`, [post.id], function(error, result) {  //삭제할 때는 id만 전송됨
+  db.query(`SELECT * FROM topic WHERE id=?`, [post.id], function(error, topic) {
     if(error) {
       next(error);
     } else {
-      response.redirect('/');
+      if(parseInt(topic[0].user_id) !== parseInt(request.user.id)) {
+        request.flash('error', 'Not yours.');
+        return response.redirect('/');
+      }
+      db.query(`DELETE FROM topic WHERE id=?`, [post.id], function(error, result) {  //삭제할 때는 id만 전송됨
+        if(error) {
+          next(error);
+        } else {
+          response.redirect('/');
+        }
+      });
     }
   });
 });
