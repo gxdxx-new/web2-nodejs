@@ -20,7 +20,9 @@ router.get('/', function(request, response) { //routing
   var fmsg = request.flash();
   var feedback = '';
   if(fmsg.success) {
-      feedback = fmsg.success[0];
+    feedback = fmsg.success[0];
+  } else if(fmsg.error) {
+    feedback = fmsg.error[0];
   }
   var title = 'Welcome';
   var description = 'Hello, Node.js';

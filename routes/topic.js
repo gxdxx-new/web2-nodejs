@@ -50,11 +50,11 @@ router.get('/create', function(request, response, next) {
 });
   
 router.post('/create_process', function(request, response, next) { //topic.create에서 post방식으로 전송됨
+  var post = request.body;
   db.query(`SELECT * FROM users WHERE id=?`, [request.user.id], function(error, user1) {
     if(error) {
       next(error);
     } else {
-      var post = request.body;
       db.query(`INSERT INTO topic (title, description, created, user_id) VALUES(?, ?, NOW(), ?);`, 
         [post.title, post.description, user1[0].id], 
         function(error, result) {
@@ -73,35 +73,48 @@ router.get('/update/:pageId', function(request, response, next) {
     if(error) {
       next(error);
     } else {
-      //if(topic[0].user_id === request.user.id) {
-        var list = template.list(request.list);
-        var html = template.HTML(sanitizeHtml(topic[0].title), list,
-          `
-          <form action="/topic/update_process" method="post">
-            <input type ="hidden" name="id" value="${topic[0].id}">
-            <p><input type="text" name="title" value="${sanitizeHtml(topic[0].title)}"></p>
-            <textarea name="description">${sanitizeHtml(topic[0].description)}</textarea>
-            <p><input type="submit"></p>
-          </form>
-          `,
-          `<a href="/topic/create">create</a>
-           <a href="/topic/update/${topic[0].id}">update</a>`,
-           auth.statusUI(request, response)
-        );
-        response.send(html);
+      console.log(topic[0].user_id);
+      console.log(request.user.id);
+      if(topic[0].user_id != request.user.id) {
+        request.flash('error', 'Not yours.');
+        return response.redirect('/');
+      }
+      var list = template.list(request.list);
+      var html = template.HTML(sanitizeHtml(topic[0].title), list,
+        `
+        <form action="/topic/update_process" method="post">
+          <input type ="hidden" name="id" value="${topic[0].id}">
+          <p><input type="text" name="title" value="${sanitizeHtml(topic[0].title)}"></p>
+          <textarea name="description">${sanitizeHtml(topic[0].description)}</textarea>
+          <p><input type="submit"></p>
+        </form>
+        `,
+        `<a href="/topic/create">create</a>
+          <a href="/topic/update/${topic[0].id}">update</a>`,
+          auth.statusUI(request, response)
+      );
+      response.send(html);
     }
   });
 });
   
 router.post('/update_process', function(request, response, next) {
   var post = request.body;
-  db.query(`UPDATE topic SET title=?, description=? WHERE id=?`,
-    [post.title, post.description, post.id],
-    function(error, result) {
+  db.query(`SELECT * FROM topic WHERE id=?`, [post.id], function(error, topic) {
     if(error) {
       next(error);
     } else {
-      response.redirect(`/topic/${post.id}`);
+      if(topic[0].user_id != request.user.id) {
+        request.flash('error', 'Not yours.');
+        return response.redirect('/');
+      }
+      db.query(`UPDATE topic SET title=?, description=? WHERE id=?`, [post.title, post.description, post.id], function(error, result) {
+        if(error) {
+          next(error);
+        } else {
+          response.redirect(`/topic/${topic[0].id}`);
+        }
+      });
     }
   });
 });
