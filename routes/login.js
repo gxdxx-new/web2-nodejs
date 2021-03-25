@@ -61,10 +61,10 @@ module.exports = function(passport) {
             `
                 <div style="color:red;">${feedback}</div>
                 <form action="/login/register_process" method="post">
-                    <p><input type="text" name="email" placeholder="email" value="nkd0310@naver.com"></p>
-                    <p><input type="password" name="password" placeholder="password" value="000000"></p>
-                    <p><input type="password" name="password2" placeholder="password" value="000000"></p>
-                    <p><input type="text" name="displayName" placeholder="display name" value="gidon"></p>
+                    <p><input type="text" name="email" placeholder="email"></p>
+                    <p><input type="password" name="password" placeholder="password"></p>
+                    <p><input type="password" name="password2" placeholder="password"></p>
+                    <p><input type="text" name="displayName" placeholder="display name"></p>
                     <p><input type="submit" value="register"></p>
                 </form>
             `,
@@ -91,7 +91,7 @@ module.exports = function(passport) {
                               } else {
                                 db.query(`SELECT * FROM users WHERE email=?`, [post.email], function(error, loginUser) {
                                     var user = {id:loginUser[0].id, email:post.email, password:hash, displayName:post.displayName};
-                                    request.login(user, function(error) {
+                                    request.login(user, function(error) {   //회원가입후 바로 로그인이 됨
                                         if(error) {
                                             next(error);
                                         } else {
@@ -107,11 +107,6 @@ module.exports = function(passport) {
                         response.redirect('/login/register');   
                     }
                 } else {
-                    if(user[0].email === post.email) {
-                        bcrypt.hash(post.password, 10, function(error, hash) {
-                        db.query(`INSERT INTO users (password, displayName) VALUES(?, ?);`, [hash, post.displayName], function(error){});
-                    });
-                    }
                     request.flash('error', 'The same email already exists.');
                     response.redirect('/login/register');
                 }

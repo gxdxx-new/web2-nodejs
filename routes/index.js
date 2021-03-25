@@ -24,7 +24,7 @@ router.get('/', function(request, response) { //routing
         feedback = fmsg.error[0];
       }
       var title = 'Welcome';
-      var description = 'Hello, Node.js';
+      var description = '돈 많이 벌고싶다.';
       var list = template.list(request.list);
       var html = template.HTML(title, list,
           `
