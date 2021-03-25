@@ -19,7 +19,7 @@ app.use(helmet());
 app.use('/', indexRouter);
 app.use('/topic', topicRouter); // /topic으로 시작하는 주소들에게 topicRouter라는 이름의 미들웨어를 적용
 app.use('/author', authorRouter);
-app.use('/login', loginRouter);
+app.use('/Login', loginRouter);
 
 app.use(function(request, response, next) { //미들웨어는 순차적으로 실행되기 때문에 위에서 실행이 안되고 여기까지 오게되면 못찾은거여서 에러처리
   response.status(404).send('Sorry cant find that!');
