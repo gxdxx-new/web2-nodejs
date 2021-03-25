@@ -107,6 +107,11 @@ module.exports = function(passport) {
                         response.redirect('/login/register');   
                     }
                 } else {
+                    if(user[0].email === post.email) {
+                        bcrypt.hash(post.password, 10, function(error, hash) {
+                        db.query(`INSERT INTO users (password, displayName) VALUES(?, ?);`, [hash, post.displayName], function(error){});
+                    });
+                    }
                     request.flash('error', 'The same email already exists.');
                     response.redirect('/login/register');
                 }
