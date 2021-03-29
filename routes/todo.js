@@ -33,11 +33,11 @@ router.get('/', function(request, response, next) {
         if(error) {
             next(error);
         } else {
-            var title = 'author';
+            var title = 'todo';
             var list = template.list(request.list);
             var html = template.HTML(title, list, 
                 `
-                ${template.authorTable(authors)}
+                ${template.todoTable(authors)}
                 <style>                            <!--CSS-->
                     table{
                         border-collapse: collapse;
@@ -94,7 +94,7 @@ router.get('/update/:pageId', function(request, response, next) {
                             var list = template.list(topics);
                             var html = template.HTML(title, list, 
                                 `
-                                ${template.authorTable(authors)}
+                                ${template.todoTable(authors)}
                                 <style>                            <!--CSS-->
                                     table{
                                         border-collapse: collapse;

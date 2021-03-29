@@ -5,12 +5,7 @@ var sanitizeHtml = require('sanitize-html');
 var express = require('express');
 var router = express.Router();
 
-router.get('*', function(request, response, next) {  //get 방식으로 들어오는 모든(*) 요청에 대해서만 처리
-  if(auth.isOwner(request, response) === false) {
-    request.flash('error', 'Please Login.');
-    response.redirect('/');
-    return false;
-  }  
+router.get('*', function(request, response, next) {  //get 방식으로 들어오는 모든(*) 요청에 대해서만 처리  
   db.query(`SELECT * FROM topic`, function(error, topics) {
     if(error) {
       next(error);
@@ -31,6 +26,11 @@ router.post('*', function(request, response, next) {
 });
 
 router.get('/create', function(request, response, next) {
+  if(auth.isOwner(request, response) === false) {
+    request.flash('error', 'Please Login.');
+    response.redirect('/');
+    return false;
+  }
         var title = 'Create';
         var list = template.list(request.list);
         var html = template.HTML(title, list,
@@ -71,13 +71,18 @@ router.post('/create_process', function(request, response, next) { //topic.creat
 });
   
 router.get('/update/:pageId', function(request, response, next) {
+  if(auth.isOwner(request, response) === false) {
+    request.flash('error', 'Please Login.');
+    response.redirect(`/`);
+    return false;
+  }
   db.query(`SELECT * FROM topic WHERE id=?`, [request.params.pageId], function(error, topic) {
     if(error) {
       next(error);
     } else {
       if(parseInt(topic[0].user_id) !== parseInt(request.user.id)) {
         request.flash('error', 'Not yours.');
-        return response.redirect('/');
+        return response.redirect(`/topic/${request.params.pageId}`);
       }
       var list = template.list(request.list);
       var html = template.HTML(sanitizeHtml(topic[0].title), list,
@@ -127,7 +132,7 @@ router.post('/delete_process', function(request, response, next) {
     } else {
       if(parseInt(topic[0].user_id) !== parseInt(request.user.id)) {
         request.flash('error', 'Not yours.');
-        return response.redirect('/');
+        return response.redirect(`/topic/${topic[0].id}`);
       }
       db.query(`DELETE FROM topic WHERE id=?`, [post.id], function(error, result) {  //삭제할 때는 id만 전송됨
         if(error) {
@@ -150,13 +155,20 @@ router.get('/:pageId', function(request, response, next) { //routing
         if(error) {
           next(error);
         } else {
+          var fmsg = request.flash();
+          var feedback = '';
+          if(fmsg.error) {
+            feedback = fmsg.error[0];
+          }
           var title = topic[0].title; //topic은 배열에 담겨서 들어옴
           var description = topic[0].description;
           var list = template.list(request.list);
           var html = template.HTML(title, list,
-            `<h2>${sanitizeHtml(title)}</h2>
+            `
+            <div style="color:red;">${feedback}</div>
+            <h2>${sanitizeHtml(title)}</h2>
             ${sanitizeHtml(description)}
-            <p>by ${sanitizeHtml(user[0].displayName)}</p>`,  //<p>태그=줄바꿈
+            <p>작성자 : ${sanitizeHtml(user[0].displayName)}</p>`,  //<p>태그=줄바꿈
             `
               <a href="/topic/create">create</a>
               <a href="/topic/update/${request.params.pageId}">update</a>

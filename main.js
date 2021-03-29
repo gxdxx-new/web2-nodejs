@@ -6,7 +6,7 @@ var helmet = require('helmet');
 
 var indexRouter = require('./routes/index.js');
 var topicRouter = require('./routes/topic.js');
-var authorRouter = require('./routes/author.js');
+var todoRouter = require('./routes/todo.js');
 var passport = require('./lib/passport.js')(app);  //require('./lib/passport.js')은 passport.js의 함수를 가리켜서 뒤에 인자를 줄 수 있음
 var loginRouter = require('./routes/login.js')(passport);
 
@@ -16,13 +16,13 @@ app.use(compression()); //compression()을 호출하면 compression미들웨어�
 app.use(helmet());
 
 
-app.use('/', indexRouter);
+app.use('/', indexRouter);  //app.js에 router를 불러와 app.use()를 통하여 지정된 경로에 미들웨어로 마운트
 app.use('/topic', topicRouter); // /topic으로 시작하는 주소들에게 topicRouter라는 이름의 미들웨어를 적용
-app.use('/author', authorRouter);
+app.use('/todo', todoRouter);
 app.use('/Login', loginRouter);
 
 app.use(function(request, response, next) { //미들웨어는 순차적으로 실행되기 때문에 위에서 실행이 안되고 여기까지 오게되면 못찾은거여서 에러처리
-  response.status(404).send('Sorry cant find that!');
+  response.status(404).send('Sorry cant find that!'); //HTTP 응답을 보내주는 역할(헤더를 자동으로 지정)
 });
 
 app.use(function(error, request, response, next) {
@@ -30,4 +30,4 @@ app.use(function(error, request, response, next) {
   response.status(500).send('Something broke!');
 });
 
-app.listen(3000, () => console.log('Example app listening on port 3000!'));
+app.listen(3000, () => console.log('Example app listening on port 3000!')); //서버 실행
