@@ -1,11 +1,11 @@
-var db = require('../lib/db.js');
-var template = require('../lib/template.js');
-var auth = require('../lib/auth.js');
-var express = require('express');
-var router = express.Router();
+const db = require('../lib/db.js');
+const template = require('../lib/template.js');
+const auth = require('../lib/auth.js');
+const express = require('express');
+const router = express.Router();
 
-router.get('*', function(request, response, next) {
-  db.query(`SELECT * FROM topic`, function(error, topics) {
+router.get('*', (request, response, next) => {
+  db.query(`SELECT * FROM topic`, (error, topics) => {
     if(error) {
         next(error);
     } else {
@@ -15,18 +15,18 @@ router.get('*', function(request, response, next) {
   });
 });
 
-router.get('/', function(request, response) { //routing
-      var fmsg = request.flash();
-      var feedback = '';
+router.get('/', (request, response) => { //routing
+      const fmsg = request.flash();
+      let feedback = '';
       if(fmsg.success) {
         feedback = fmsg.success[0];
       } else if(fmsg.error) {
         feedback = fmsg.error[0];
       }
-      var title = 'Welcome';
-      var description = '돈 많이 벌고싶다.';
-      var list = template.list(request.list);
-      var html = template.HTML(title, list,
+      const title = 'Welcome';
+      const description = '돈 많이 벌고싶다.';
+      const list = template.list(request.list);
+      const html = template.HTML(title, list,
           `
             <div style="color:blue;">${feedback}</div>
             <h2>${title}</h2>

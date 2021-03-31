@@ -1,14 +1,14 @@
-var express = require('express');
-var app = express()
-var bodyParser = require('body-parser');
-var compression = require('compression'); //데이터를 압축
-var helmet = require('helmet');
+const express = require('express');
+const app = express()
+const bodyParser = require('body-parser');
+const compression = require('compression'); //데이터를 압축
+const helmet = require('helmet');
 
-var indexRouter = require('./routes/index.js');
-var topicRouter = require('./routes/topic.js');
-var todoRouter = require('./routes/todo.js');
-var passport = require('./lib/passport.js')(app);  //require('./lib/passport.js')은 passport.js의 함수를 가리켜서 뒤에 인자를 줄 수 있음
-var loginRouter = require('./routes/login.js')(passport);
+const indexRouter = require('./routes/index.js');
+const topicRouter = require('./routes/topic.js');
+const todoRouter = require('./routes/todo.js');
+const passport = require('./lib/passport.js')(app);  //require('./lib/passport.js')은 passport.js의 함수를 가리켜서 뒤에 인자를 줄 수 있음
+const loginRouter = require('./routes/login.js')(passport);
 
 app.use(express.static('public'));  //정적인 파일을 서비스 하기 위한 public 디렉토리 안에서 static 파일을 찾음(안전해짐)
 app.use(bodyParser.urlencoded({extended: false}));  //bodyParser미들웨어가 실행됨(사용자가 전송한 *post* data를 내부적으로 분석해서 callback함수의 request객체의 body property를 넘김)

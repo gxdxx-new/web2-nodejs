@@ -1,20 +1,20 @@
-var db = require('../lib/db.js');
-var template = require('../lib/template.js');
-var auth = require('../lib/auth.js');
-var express = require('express');
-var router = express.Router();
-var bcrypt = require('bcrypt');
+const db = require('../lib/db.js');
+const template = require('../lib/template.js');
+const auth = require('../lib/auth.js');
+const express = require('express');
+const router = express.Router();
+const bcrypt = require('bcrypt');
 
 module.exports = function(passport) {
     router.get('/', function(request, response) { //routing
-        var fmsg = request.flash();
-        var feedback = '';
+        const fmsg = request.flash();
+        let feedback = '';
         if(fmsg.error) {
             feedback = fmsg.error[0];
         }
-        var title = 'WEB - Login';
-        var list = template.list(request.list);
-        var html = template.HTML(title, list,
+        const title = 'WEB - Login';
+        const list = template.list(request.list);
+        const html = template.HTML(title, list,
             `
                 <div style="color:red;">${feedback}</div>
                 <form action="/login/login_process" method="post">
@@ -50,14 +50,14 @@ module.exports = function(passport) {
     });
 
     router.get('/register', function(request, response) { //routing
-        var fmsg = request.flash();
-        var feedback = '';
+        const fmsg = request.flash();
+        let feedback = '';
         if(fmsg.error) {
             feedback = fmsg.error[0];
         }
-        var title = 'WEB - Login';
-        var list = template.list(request.list);
-        var html = template.HTML(title, list,
+        const title = 'WEB - Login';
+        const list = template.list(request.list);
+        const html = template.HTML(title, list,
             `
                 <div style="color:red;">${feedback}</div>
                 <form action="/login/register_process" method="post">
@@ -74,8 +74,8 @@ module.exports = function(passport) {
         response.send(html);
     });
 
-    router.post('/register_process', function(request, response, next) { //topic.create에서 post방식으로 전송됨
-        var post = request.body;
+    router.post('/register_process', function(request, response, next) { //topic.register에서 post방식으로 전송됨
+        const post = request.body;
         db.query(`SELECT email FROM users WHERE email=?`, [post.email], function(error, user) {
             if(error) {
               next(error);
@@ -90,7 +90,7 @@ module.exports = function(passport) {
                                 next(error);
                               } else {
                                 db.query(`SELECT * FROM users WHERE email=?`, [post.email], function(error, loginUser) {
-                                    var user = {id:loginUser[0].id, email:post.email, password:hash, displayName:post.displayName};
+                                    const user = {id:loginUser[0].id, email:post.email, password:hash, displayName:post.displayName};
                                     request.login(user, function(error) {   //회원가입후 바로 로그인이 됨
                                         if(error) {
                                             next(error);

@@ -1,9 +1,9 @@
-var db = require('../lib/db.js');
-var template = require('../lib/template.js');
-var auth = require('../lib/auth.js');
-var sanitizeHtml = require('sanitize-html');
-var express = require('express');
-var router = express.Router();
+const db = require('../lib/db.js');
+const template = require('../lib/template.js');
+const auth = require('../lib/auth.js');
+const sanitizeHtml = require('sanitize-html');
+const express = require('express');
+const router = express.Router();
 
 router.get('*', function(request, response, next) {  //get 방식으로 들어오는 모든(*) 요청에 대해서만 처리  
   db.query(`SELECT * FROM topic`, function(error, topics) {
@@ -52,7 +52,7 @@ router.get('/create', function(request, response, next) {
 });
   
 router.post('/create_process', function(request, response, next) { //topic.create에서 post방식으로 전송됨
-  var post = request.body;
+  const post = request.body;
   db.query(`SELECT * FROM users WHERE id=?`, [request.user.id], function(error, user1) {
     if(error) {
       next(error);
@@ -84,8 +84,8 @@ router.get('/update/:pageId', function(request, response, next) {
         request.flash('error', 'Not yours.');
         return response.redirect(`/topic/${request.params.pageId}`);
       }
-      var list = template.list(request.list);
-      var html = template.HTML(sanitizeHtml(topic[0].title), list,
+      const list = template.list(request.list);
+      const html = template.HTML(sanitizeHtml(topic[0].title), list,
         `
         <form action="/topic/update_process" method="post">
           <input type ="hidden" name="id" value="${topic[0].id}">
@@ -104,7 +104,7 @@ router.get('/update/:pageId', function(request, response, next) {
 });
   
 router.post('/update_process', function(request, response, next) {
-  var post = request.body;
+  const post = request.body;
   db.query(`SELECT * FROM topic WHERE id=?`, [post.id], function(error, topic) {
     if(error) {
       next(error);
@@ -125,7 +125,7 @@ router.post('/update_process', function(request, response, next) {
 });
   
 router.post('/delete_process', function(request, response, next) {
-  var post = request.body;
+  const post = request.body;
   db.query(`SELECT * FROM topic WHERE id=?`, [post.id], function(error, topic) {
     if(error) {
       next(error);
@@ -155,15 +155,15 @@ router.get('/:pageId', function(request, response, next) { //routing
         if(error) {
           next(error);
         } else {
-          var fmsg = request.flash();
-          var feedback = '';
+          const fmsg = request.flash();
+          let feedback = '';
           if(fmsg.error) {
             feedback = fmsg.error[0];
           }
-          var title = topic[0].title; //topic은 배열에 담겨서 들어옴
-          var description = topic[0].description;
-          var list = template.list(request.list);
-          var html = template.HTML(title, list,
+          const title = topic[0].title; //topic은 배열에 담겨서 들어옴
+          const description = topic[0].description;
+          const list = template.list(request.list);
+          const html = template.HTML(title, list,
             `
             <div style="color:red;">${feedback}</div>
             <h2>${sanitizeHtml(title)}</h2>

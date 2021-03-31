@@ -1,9 +1,9 @@
-var db = require('../lib/db.js');
-var template = require('../lib/template.js');
-var auth = require('../lib/auth.js');
-var sanitizeHtml = require('sanitize-html');
-var express = require('express');
-var router = express.Router();
+const db = require('../lib/db.js');
+const template = require('../lib/template.js');
+const auth = require('../lib/auth.js');
+const sanitizeHtml = require('sanitize-html');
+const express = require('express');
+const router = express.Router();
 
 router.get('*', function(request, response, next) {  //get 방식으로 들어오는 모든(*) 요청에 대해서만 처리
     if(auth.isOwner(request, response) === false) {
@@ -33,9 +33,9 @@ router.get('/', function(request, response, next) {
         if(error) {
             next(error);
         } else {
-            var title = 'todo';
-            var list = template.list(request.list);
-            var html = template.HTML(title, list, 
+            const title = 'todo';
+            const list = template.list(request.list);
+            const html = template.HTML(title, list, 
                 `
                 ${template.todoTable(authors)}
                 <style>                            <!--CSS-->
@@ -67,7 +67,7 @@ router.get('/', function(request, response, next) {
 });
 
 router.post('/create_process', function(request, response, next) {
-    var post = request.body;
+    const post = request.body;
     db.query(`INSERT INTO author (name, profile) VALUES(?, ?);`, [post.name, post.profile], function(error, result) {
         if(error) {
             next(error);
@@ -90,9 +90,9 @@ router.get('/update/:pageId', function(request, response, next) {
                         if(error3) {
                             next(error);
                         } else {
-                            var title = 'author';
-                            var list = template.list(topics);
-                            var html = template.HTML(title, list, 
+                            const title = 'author';
+                            const list = template.list(topics);
+                            const html = template.HTML(title, list, 
                                 `
                                 ${template.todoTable(authors)}
                                 <style>                            <!--CSS-->
@@ -131,7 +131,7 @@ router.get('/update/:pageId', function(request, response, next) {
 });
 
 router.post('/update_process', function(request, response, next) {
-    var post = request.body;
+    const post = request.body;
     db.query(`UPDATE author SET name=?, profile=? WHERE id=?;`, [post.name, post.profile, post.id], function(error, result){
         if(error) {
             next(error);
@@ -142,7 +142,7 @@ router.post('/update_process', function(request, response, next) {
 })
 
 router.post('/delete_process', function(request, response, next) {
-    var post = request.body;
+    const post = request.body;
     db.query(`DELETE FROM topic WHERE author_id=?`, [post.id], function(error1, result1) {    //author을 삭제 전에 author가 쓴 topic들부터 지우게함
         if(error1) {
             next(error1);
