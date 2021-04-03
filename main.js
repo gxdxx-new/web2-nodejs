@@ -1,5 +1,5 @@
 const express = require('express');
-const app = express()
+const app = express();
 const bodyParser = require('body-parser');
 const compression = require('compression'); //데이터를 압축
 const helmet = require('helmet');
@@ -27,7 +27,7 @@ app.use(function(request, response, next) { //미들웨어는 순차적으로 �
 
 app.use(function(error, request, response, next) {
   console.error(error.stack);
-  response.status(500).send('Something broke!');
+  response.status(500).send('Something broke!');  //서버 에러
 });
 
 app.listen(3000, () => console.log('Example app listening on port 3000!')); //서버 실행
