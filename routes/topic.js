@@ -45,7 +45,7 @@ router.get('/create', function(request, response, next) {
               <input type="submit"> <!--전송버튼-->
             </p>
           </form>`,
-          `<a href="/topic/create">create</a>`,
+          `<a href="/topic/create">글쓰기</a>`,
           auth.statusUI(request, response)
         );
         response.send(html);
@@ -94,8 +94,8 @@ router.get('/update/:pageId', function(request, response, next) {
           <p><input type="submit"></p>
         </form>
         `,
-        `<a href="/topic/create">create</a>
-          <a href="/topic/update/${topic[0].id}">update</a>`,
+        `<a href="/topic/create">글쓰기</a>
+          <a href="/topic/update/${topic[0].id}">수정</a>`,
           auth.statusUI(request, response)
       );
       response.send(html);
@@ -170,8 +170,8 @@ router.get('/:pageId', function(request, response, next) { //routing
             ${sanitizeHtml(description)}
             <p>작성자 : ${sanitizeHtml(user[0].displayName)}</p>`,  //<p>태그=줄바꿈
             `
-              <a href="/topic/create">create</a>
-              <a href="/topic/update/${request.params.pageId}">update</a>
+              <a href="/topic/create">글쓰기</a>
+              <a href="/topic/update/${request.params.pageId}">수정</a>
               <form action="/topic/delete_process" method="post">  <!--delete링크는 알려지면 안돼서 form으로 해야됨-->
                 <input type="hidden" name="id" value="${request.params.pageId}">
                 <input type="submit" value="delete">  <!--delete란 이름의 버튼 생성-->

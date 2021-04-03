@@ -24,16 +24,16 @@ router.get('/', (request, response) => { //routing
         feedback = fmsg.error[0];
       }
       const title = 'Welcome';
-      const description = '돈 많이 벌고싶다.';
+      const description = 'ing...';
       const list = template.list(request.list);
       const html = template.HTML(title, list,
           `
             <div style="color:blue;">${feedback}</div>
             <h2>${title}</h2>
             ${description}
-            <img src="/images/hello.jpg" style="width:800px; display:block; margin-top:20px;">
+            <img src="/images/hello.jpg" style="width:600px; display:block; margin-top:20px;">
           `,
-          `<a href="/topic/create">create</a>`,
+          `<a href="/topic/create">글쓰기</a>`,
           auth.statusUI(request, response)
       );
       response.send(html);
